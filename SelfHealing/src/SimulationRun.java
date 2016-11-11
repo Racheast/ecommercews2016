@@ -2,25 +2,32 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SimulationRun implements Runnable{
+	private final int x_max=100;
+	private final int y_max=100;
 	
-	private static EdgeController initEdgeController(){
-		EdgeController controller=new EdgeController();
+	private EdgeController initEdgeController(){
+		EdgeController controller=new EdgeController(x_max,y_max);
 		//generate Edges and according PMs
 		for(int x=0; x<controller.getMap().length;x++){
 			for(int y=0; y<controller.getMap()[0].length;y++){
 				 //generate uniformly distributed random nr. either 0,1,..,14 or 15
 				 Random rand=new Random();
 				 int randNr=rand.nextInt(15);
+				 double u0=rand.nextGaussian()*10 + 100;
+				 int bandwidth=(int) Math.round(rand.nextGaussian() * 3 + 10000);
 				 if(randNr==1){
-					 Edge edge=new Edge(x,y);
+					 Edge edge=new Edge(x,y,u0, bandwidth);
 					 edge.setPms(generatePMs(10));  //max 10 PMs per edge !!
 					 controller.addEdge(x, y, edge);
 				 }
 			}
 		}
-		
+	
+		/*
 		//generate random bandwiths for each pair of edges
 		ArrayList<Edge> edges=controller.getEdges();
 		for(Edge e1:edges){
@@ -32,7 +39,7 @@ public class SimulationRun implements Runnable{
 				}
 			}
 		}
-	
+		*/
 		
 		return controller;
 	}
@@ -48,24 +55,43 @@ public class SimulationRun implements Runnable{
 			int cpu=(int) Math.round(rand.nextGaussian() * 15 + 1000000);
 			int memory=(int) Math.round(rand.nextGaussian() * 15 + 5000000);
 			int size=(int) Math.round(rand.nextGaussian() *2 +5);
-			int network_bandwidth=(int) Math.round(rand.nextGaussian() *2 +5);
 			
 			double u0=rand.nextGaussian()*10 + 100;
 			double u_cpu=rand.nextGaussian()*12 + 200;
 			double u_mem=rand.nextGaussian()*11 + 400;
 			double u_network=rand.nextGaussian()*10 + 100;
 			
-			PM pm=new PM(u0,u_cpu,u_mem,u_network,cpu,memory,size, network_bandwidth);
+			PM pm=new PM(u0,u_cpu,u_mem,u_network,cpu,memory,size);
 			pms.put(pm.getID(), pm);
 		}
 		return pms;
 	}
-
+	
+	private Request generateRequest(){
+		Random rand=new Random();
+		int needed_memory=(int) Math.round(rand.nextGaussian() * 15 + 1000);
+		int needed_cpu=(int) Math.round(rand.nextGaussian() * 15 + 1500);
+		int needed_bandwidth=(int) Math.round(rand.nextGaussian() * 15 + 1500);
+		int needed_size=(int) Math.round(rand.nextGaussian() * 2 + 2);
+		int runtime=(int) Math.round(rand.nextGaussian() * 15 + 100);
+		int x_coordinate=rand.nextInt(x_max+1);
+		int y_coordinate=rand.nextInt(y_max+1);
+		return new Request(needed_memory,needed_cpu,needed_bandwidth,needed_size,runtime,x_coordinate,y_coordinate);
+	}
+	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
 		EdgeController controller=initEdgeController();
+		System.out.println("**Initialized map**");
 		System.out.println(controller.printMap());
+		
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask(){
+			@Override
+			public void run() {
+				controller.sendRequest(generateRequest());
+			} }, 0, 5000);
 	}
 	
 	/*

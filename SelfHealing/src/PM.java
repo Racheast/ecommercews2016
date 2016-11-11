@@ -13,14 +13,14 @@ public class PM{
 	private int memory;
 	private int size;
 	private int network_bandwidth; //mbit per sec
-	
+	/*
 	private int consumed_cpu;
 	private int consumed_memory;
 	private int consumed_networkBandwith;
+	*/
 	
 	
-	
-	public PM(double u0, double u_cpu, double u_mem, double u_network, int cpu, int memory, int size, int network_bandwidth) {
+	public PM(double u0, double u_cpu, double u_mem, double u_network, int cpu, int memory, int size) {
 		this.ID=id_counter++;
 		this.u0=u0;
 		this.u_cpu=u_cpu;
@@ -29,11 +29,10 @@ public class PM{
 		this.cpu = cpu;
 		this.memory = memory;
 		this.size = size;
-		this.network_bandwidth=network_bandwidth;
 	}
 
-	private void assignApplication(Application application){
-		//distribute application among proper VMs
+	private void startApplication(Request application){
+		//VM vm=new VM();
 	}
 	
 	public HashMap<Integer, VM> getVms() {
@@ -61,29 +60,51 @@ public class PM{
 		this.size = size;
 	}
 	public int getConsumed_cpu() {
+		int consumed_cpu=0;
+		for(VM vm:getListOfVMs()){
+			consumed_cpu+=vm.getConsumed_cpu();
+		}
 		return consumed_cpu;
 	}
-	public void setConsumed_cpu(int consumed_cpu) {
-		this.consumed_cpu = consumed_cpu;
-	}
+	
 	public int getConsumed_memory() {
+		int consumed_memory=0;
+		for(VM vm:getListOfVMs()){
+			consumed_memory+=vm.getConsumed_memory();
+		}
 		return consumed_memory;
 	}
-	public void setConsumed_memory(int consumed_memory) {
-		this.consumed_memory = consumed_memory;
-	}
+	
 	public int getConsumed_networkBandwith() {
+		int consumed_networkBandwith=0;
+		for(VM vm:getListOfVMs()){
+			consumed_networkBandwith+=vm.getConsumed_networkBandwith();
+		}
 		return consumed_networkBandwith;
 	}
-	public void setConsumed_networkBandwith(int consumed_networkBandwith) {
-		this.consumed_networkBandwith = consumed_networkBandwith;
-	}
+	
 	public int getID(){
 		return this.ID;
 	}
 	
+	public int getNetwork_bandwidth() {
+		return network_bandwidth;
+	}
+
+	public void setNetwork_bandwidth(int network_bandwidth) {
+		this.network_bandwidth = network_bandwidth;
+	}
+
 	public void removeVM(int id){
 		this.vms.remove(id);
+	}
+	
+	private ArrayList<VM> getListOfVMs(){
+		ArrayList<VM> vmList=new ArrayList<VM>();
+		Set<Integer> keys=vms.keySet();
+		for(int key:keys)
+			vmList.add(vms.get(key));
+		return vmList;
 	}
 	
 	public double getEnergyUtilization(){

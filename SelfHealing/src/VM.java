@@ -8,35 +8,37 @@ public class VM{
 	private int consumed_memory;
 	private int consumed_networkBandwith;  //depends on the consumed memory
 	private int runtime;
-	private double page_dirtying_rate;  //depends linearly on the combination of the utilized memory
+	private double page_dirtying_rate;  //depends linearly on the combination of the utilized memory, cpu and nw_bandwidth
 	
-	private Application application;
+	private Request application;
 	
-	public VM(int size, int consumed_cpu, int consumed_memory, int consumed_networkBandwith, int runtime,
-			double page_dirtying_rate) {
+	public VM(Request request){
+		this.ID=id_counter++;
+		this.size=request.getNeeded_size();
+		this.consumed_cpu=request.getNeeded_cpu();
+		this.consumed_memory=request.getNeeded_memory();
+		this.consumed_networkBandwith=request.getNeeded_bandwidth();
+		this.runtime=request.getRuntime(); //TODO: calculate real value via formula
+		this.page_dirtying_rate=0.2; //TODO: calculate real value via formula
+	}
+	
+	public VM(int size, int consumed_cpu, int consumed_memory, int runtime) {
 		super();
 		this.ID=id_counter++;
 		this.size = size;
 		this.consumed_cpu = consumed_cpu;
 		this.consumed_memory = consumed_memory;
-		this.consumed_networkBandwith = consumed_networkBandwith;
 		this.runtime = runtime;
-		this.page_dirtying_rate = page_dirtying_rate;
+		this.consumed_networkBandwith=10;  //TODO: calculate real value via formula
+		this.page_dirtying_rate=0.2;  //TODO: calculate real value via formula
 	}
 	
-	public VM(Application application){
-		this.ID=id_counter++;
-		this.consumed_cpu=application.getNeeded_cpu();
-		this.consumed_memory=application.getNeeded_memory();
-		this.consumed_networkBandwith=0;  //TODO: calculate nwBandwith. depends on the consumed memory
-		this.runtime=0;
-		this.page_dirtying_rate=0.2;  //depends linearly on the combination of the utilized memory
-	}
+
 	
-	public Application getApplication() {
+	public Request getApplication() {
 		return application;
 	}
-	public void setApplication(Application application) {
+	public void setApplication(Request application) {
 		consumeResources(application);
 		this.application = application;
 	}
@@ -74,7 +76,7 @@ public class VM{
 		return this.ID;
 	}
 	
-	private void consumeResources(Application application){
+	private void consumeResources(Request application){
 		if(application!=null){
 			this.consumed_cpu=application.getNeeded_cpu();
 			this.consumed_memory=application.getNeeded_memory();
