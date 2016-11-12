@@ -1,5 +1,7 @@
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class VM{
+public class VM implements Runnable{
 	//
 	private final int ID;
 	private static int id_counter=1;
@@ -9,9 +11,7 @@ public class VM{
 	private int consumed_networkBandwith;  //depends on the consumed memory
 	private int runtime;
 	private double page_dirtying_rate;  //depends linearly on the combination of the utilized memory, cpu and nw_bandwidth
-	
-	private Request application;
-	
+		
 	public VM(Request request){
 		this.ID=id_counter++;
 		this.size=request.getNeeded_size();
@@ -32,16 +32,7 @@ public class VM{
 		this.consumed_networkBandwith=10;  //TODO: calculate real value via formula
 		this.page_dirtying_rate=0.2;  //TODO: calculate real value via formula
 	}
-	
 
-	
-	public Request getApplication() {
-		return application;
-	}
-	public void setApplication(Request application) {
-		consumeResources(application);
-		this.application = application;
-	}
 	public int getRuntime() {
 		return runtime;
 	}
@@ -75,17 +66,19 @@ public class VM{
 	public int getID(){
 		return this.ID;
 	}
-	
-	private void consumeResources(Request application){
-		if(application!=null){
-			this.consumed_cpu=application.getNeeded_cpu();
-			this.consumed_memory=application.getNeeded_memory();
-			this.consumed_networkBandwith=0; //CALCULATE nwBandwith!!
-		}else{
-			this.consumed_cpu=0;
-			this.consumed_memory=0;
-			this.consumed_networkBandwith=0; 
-		}
+
+	@Override
+	public void run() {
+		
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask(){
+			@Override
+			public void run() {
+				//stop the VM and release specs in PM/edge
+			} }, 0, runtime);
+		
 	}
+	
+	
 	
 }

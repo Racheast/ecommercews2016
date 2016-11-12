@@ -31,8 +31,11 @@ public class PM{
 		this.size = size;
 	}
 
-	private void startApplication(Request application){
-		//VM vm=new VM();
+	public VM startApplication(Request request){
+		VM vm=new VM(request);
+		vms.put(vm.getID(),vm);
+		System.out.println("VM"+vm.getID()+" created!");
+		return vm;
 	}
 	
 	public HashMap<Integer, VM> getVms() {
@@ -95,7 +98,8 @@ public class PM{
 		this.network_bandwidth = network_bandwidth;
 	}
 
-	public void removeVM(int id){
+	public void shutdownVM(int id){
+		System.out.println("shutting down VM"+this.getID());
 		this.vms.remove(id);
 	}
 	
@@ -119,5 +123,14 @@ public class PM{
 		
 		return u_total;
 	}
+
+	@Override
+	public String toString() {
+		return "PM [vms=" + vms + ", ID=" + ID + ", u0=" + u0 + ", u_cpu=" + u_cpu + ", u_mem=" + u_mem + ", u_network="
+				+ u_network + ", cpu=" + cpu + ", memory=" + memory + ", size=" + size + ", network_bandwidth="
+				+ network_bandwidth + "]";
+	}
+	
+	
 	
 }

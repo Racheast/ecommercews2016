@@ -1,24 +1,25 @@
+import Interfaces.LocationElement;
 
-public class Request {
+public class Request implements LocationElement{
 	private int needed_memory;
 	private int needed_cpu;
 	private int needed_bandwidth;
 	private int needed_size;
 	private int runtime;
 	
-	private int x_coordinate;
-	private int y_coordinate;
+	private int xCoordinate;
+	private int yCoordinate;
 	
 	public Request(int needed_memory, int needed_cpu, int needed_bandwidth, int needed_size, int runtime,
-			int x_coordinate, int y_coordinate) {
+			int xCoordinate, int yCoordinate) {
 		super();
 		this.needed_memory = needed_memory;
 		this.needed_cpu = needed_cpu;
 		this.needed_bandwidth = needed_bandwidth;
 		this.needed_size = needed_size;
 		this.runtime = runtime;
-		this.x_coordinate = x_coordinate;
-		this.y_coordinate = y_coordinate;
+		this.xCoordinate = xCoordinate;
+		this.yCoordinate = yCoordinate;
 	}
 	public int getNeeded_memory() {
 		return needed_memory;
@@ -51,17 +52,24 @@ public class Request {
 	public void setRuntime(int runtime) {
 		this.runtime = runtime;
 	}
-	public int getX_coordinate() {
-		return x_coordinate;
+	public int getxCoordinate() {
+		return xCoordinate;
 	}
-	public void setX_coordinate(int x_coordinate) {
-		this.x_coordinate = x_coordinate;
+	public void setxCoordinate(int xCoordinate) {
+		this.xCoordinate = xCoordinate;
 	}
-	public int getY_coordinate() {
-		return y_coordinate;
+	public int getyCoordinate() {
+		return yCoordinate;
 	}
-	public void setY_coordinate(int y_coordinate) {
-		this.y_coordinate = y_coordinate;
+	public void setyCoordinate(int yCoordinate) {
+		this.yCoordinate = yCoordinate;
+	}
+	
+	@Override
+	public String toString() {
+		return "Request [needed_memory=" + needed_memory + ", needed_cpu=" + needed_cpu + ", needed_bandwidth="
+				+ needed_bandwidth + ", needed_size=" + needed_size + ", runtime=" + runtime + ", xCoordinate="
+				+ xCoordinate + ", yCoordinate=" + yCoordinate + "]";
 	}
 	
 	

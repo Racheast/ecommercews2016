@@ -6,8 +6,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class SimulationRun implements Runnable{
-	private final int x_max=100;
-	private final int y_max=100;
+	private final int x_max;
+	private final int y_max;
+	
+	public SimulationRun(int x_max, int y_max){
+		this.x_max=x_max;
+		this.y_max=y_max;
+	}
 	
 	private EdgeController initEdgeController(){
 		EdgeController controller=new EdgeController(x_max,y_max);
@@ -21,7 +26,9 @@ public class SimulationRun implements Runnable{
 				 int bandwidth=(int) Math.round(rand.nextGaussian() * 3 + 10000);
 				 if(randNr==1){
 					 Edge edge=new Edge(x,y,u0, bandwidth);
-					 edge.setPms(generatePMs(10));  //max 10 PMs per edge !!
+					 System.out.println(edge);
+					 randNr=1+rand.nextInt(10);
+					 edge.setPms(generatePMs(randNr));  //max 10 PMs per edge !!
 					 controller.addEdge(x, y, edge);
 				 }
 			}
@@ -62,6 +69,7 @@ public class SimulationRun implements Runnable{
 			double u_network=rand.nextGaussian()*10 + 100;
 			
 			PM pm=new PM(u0,u_cpu,u_mem,u_network,cpu,memory,size);
+			System.out.println(pm);
 			pms.put(pm.getID(), pm);
 		}
 		return pms;
@@ -72,10 +80,10 @@ public class SimulationRun implements Runnable{
 		int needed_memory=(int) Math.round(rand.nextGaussian() * 15 + 1000);
 		int needed_cpu=(int) Math.round(rand.nextGaussian() * 15 + 1500);
 		int needed_bandwidth=(int) Math.round(rand.nextGaussian() * 15 + 1500);
-		int needed_size=(int) Math.round(rand.nextGaussian() * 2 + 2);
-		int runtime=(int) Math.round(rand.nextGaussian() * 15 + 100);
-		int x_coordinate=rand.nextInt(x_max+1);
-		int y_coordinate=rand.nextInt(y_max+1);
+		int needed_size=(int) Math.round(rand.nextGaussian() * 1.75 + 1);
+		int runtime=(int) Math.round(rand.nextGaussian() * 15 + 5000);  //runtime 5000msec = 5seconds in average
+		int x_coordinate=rand.nextInt(x_max);
+		int y_coordinate=rand.nextInt(y_max);
 		return new Request(needed_memory,needed_cpu,needed_bandwidth,needed_size,runtime,x_coordinate,y_coordinate);
 	}
 	
@@ -85,13 +93,20 @@ public class SimulationRun implements Runnable{
 		EdgeController controller=initEdgeController();
 		System.out.println("**Initialized map**");
 		System.out.println(controller.printMap());
+		ArrayList<VM> vms=new ArrayList<VM>();
 		
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask(){
 			@Override
 			public void run() {
-				controller.sendRequest(generateRequest());
+				Request request=generateRequest();
+				System.out.println(request);
+				VM vm=controller.sendRequest(request);
+				if(vm!=null)
+					vms.add(vm);
 			} }, 0, 5000);
+		
+		
 	}
 	
 	/*

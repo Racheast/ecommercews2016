@@ -3,7 +3,9 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 
-public class Edge{
+import Interfaces.LocationElement;
+
+public class Edge implements LocationElement{
 	private final int ID;
 	private static int id_counter=1;
 	private HashMap<Integer,PM> pms=new HashMap<Integer,PM>();
@@ -43,7 +45,7 @@ public class Edge{
 		this.yCoordinate = yCoordinate;
 	}
 
-	public boolean assignRequest(Request request){
+	public VM assignRequest(Request request){
 		//1. assign application to proper pm
 		//2. allocate a certain amount of available bandwidth to the pm
 
@@ -54,17 +56,20 @@ public class Edge{
 		for(PM pm:pmList){
 			bandwidthSum+=pm.getNetwork_bandwidth();
 		}
+		
 		if((this.bandwidth - bandwidthSum) >= request.getNeeded_bandwidth()){
 			for(PM pm:pmList){
-				if((pm.getCpu() - pm.getConsumed_cpu()) >= request.getNeeded_cpu() && (pm.getMemory()-pm.getConsumed_memory()) >= request.getNeeded_memory() && (pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= request.getNeeded_bandwidth()){
+				//(pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= request.getNeeded_bandwidth()
+				if((pm.getCpu() - pm.getConsumed_cpu()) >= request.getNeeded_cpu() && (pm.getMemory()-pm.getConsumed_memory()) >= request.getNeeded_memory() && (pm.getConsumed_networkBandwith()==0 || (pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= request.getNeeded_bandwidth())){
 					pm.setNetwork_bandwidth(request.getNeeded_bandwidth());
 					System.out.println("Assigning request to PM"+pm.getID());
-					return true;
+					VM vm=pm.startApplication(request);
+					return vm;
 				}
 			}
 		}
 		System.out.println("No available PM found in edge"+this.ID);
-		return false;
+		return null;
 	}
 	
 	public void putPM(Integer key, PM pm){
@@ -111,6 +116,12 @@ public class Edge{
 			pmList.add(pms.get(key));
 		}
 		return pmList;
+	}
+
+	@Override
+	public String toString() {
+		return "Edge [ID=" + ID + ", pms=" + pms + ", xCoordinate=" + xCoordinate + ", yCoordinate=" + yCoordinate
+				+ ", u0=" + u0 + ", bandwidth=" + bandwidth + "]";
 	}
 	
 }
