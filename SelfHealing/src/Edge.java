@@ -5,6 +5,7 @@ import java.util.Set;
 
 import Interfaces.LocationElement;
 import Interfaces.Remote;
+import Interfaces.SpecificationElement;
 
 public class Edge implements LocationElement{
 	private final int ID;
@@ -37,16 +38,8 @@ public class Edge implements LocationElement{
 	public int getyCoordinate() {
 		return yCoordinate;
 	}
-	
-	public void setxCoordinate(int xCoordinate) {
-		this.xCoordinate = xCoordinate;
-	}
 
-	public void setyCoordinate(int yCoordinate) {
-		this.yCoordinate = yCoordinate;
-	}
-
-	public RemoteClient assignRequest(Request request){
+	public synchronized RemoteClient assignRequest(SpecificationElement specificationElement){
 		//1. assign application to proper pm
 		//2. allocate a certain amount of available bandwidth to the pm
 
@@ -57,13 +50,20 @@ public class Edge implements LocationElement{
 			bandwidthSum+=pm.getNetwork_bandwidth();
 		}
 		
-		if((this.bandwidth - bandwidthSum) >= request.getNeeded_bandwidth()){
+		if((this.bandwidth - bandwidthSum) >= specificationElement.getNetworkBandwidth()){
 			for(PM pm:pmList){
 				//(pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= request.getNeeded_bandwidth()
-				if((pm.getCpu() - pm.getConsumed_cpu()) >= request.getNeeded_cpu() && (pm.getMemory()-pm.getConsumed_memory()) >= request.getNeeded_memory() && (pm.getConsumed_networkBandwith()==0 || (pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= request.getNeeded_bandwidth())){
-					pm.setNetwork_bandwidth(request.getNeeded_bandwidth());
-					System.out.println("Assigning Request"+request.getID()+" to PM"+pm.getID());
-					RemoteClient remoteClient=pm.startApplication(request);
+				if((pm.getCpu() - pm.getConsumed_cpu()) >= specificationElement.getCpu() && (pm.getMemory()-pm.getConsumed_memory()) >= specificationElement.getMemory() && (pm.getConsumed_networkBandwith()==0 || (pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= specificationElement.getNetworkBandwidth())){
+					pm.setNetwork_bandwidth(specificationElement.getNetworkBandwidth());
+					String s="";
+					
+					if(specificationElement instanceof Request)
+						s="Request";
+					else if(specificationElement instanceof VM)
+						s="VM";
+					
+					System.out.println("Assigning "+s+specificationElement.getID()+" to PM"+pm.getID());
+					RemoteClient remoteClient=pm.startApplication(specificationElement);
 					remoteClient.setEdge_ID(this.ID);
 					return remoteClient;
 				}
@@ -73,7 +73,7 @@ public class Edge implements LocationElement{
 		return null;
 	}
 	
-	public void putPM(Integer key, PM pm){
+	public synchronized void putPM(Integer key, PM pm){
 		pms.put(key, pm);
 	}
 	
@@ -81,27 +81,15 @@ public class Edge implements LocationElement{
 		return pms;
 	}
 	
-	public void setPms(HashMap<Integer, PM> pms) {
+	public synchronized void setPms(HashMap<Integer, PM> pms) {
 		this.pms = pms;
 	}
 	
 	public int getBandwidth(){
 		return this.bandwidth;
 	}
-	/*
-	public int getBandwith(Edge targetEdge){
-		return bandwidths.get(targetEdge);
-	}
 	
-	public void setBandwith(Edge targetEdge, int bandwith){
-		bandwidths.put(targetEdge.getID(), bandwith);
-	}
-	
-	public void setBandwith(int targetEdgeID, int bandwith){
-		bandwidths.put(targetEdgeID,bandwith);
-	}
-	*/
-	public double getEnergyUtilization(){
+	public synchronized double getEnergyUtilization(){
 		double u_total=u0;
 		Set<Integer> keys=pms.keySet();
 		for(int key:keys){
@@ -110,7 +98,7 @@ public class Edge implements LocationElement{
 		return u_total;
 	}
 	
-	private ArrayList<PM> getListOfPMs(){
+	private synchronized ArrayList<PM> getListOfPMs(){
 		Set<Integer> keys=pms.keySet();
 		ArrayList<PM> pmList=new ArrayList<PM>();
 		for(int key:keys){
@@ -118,7 +106,7 @@ public class Edge implements LocationElement{
 		}
 		return pmList;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Edge [ID=" + ID + ", pms=" + pms + ", xCoordinate=" + xCoordinate + ", yCoordinate=" + yCoordinate

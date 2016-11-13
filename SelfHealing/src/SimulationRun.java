@@ -106,13 +106,15 @@ public class SimulationRun implements Runnable{
 				System.out.println("\n"+request);
 				Remote remote=controller.sendRequest(request);
 				
-				Timer timer=new Timer();
-				timer.schedule(new TimerTask(){
-					@Override
-					public void run() {
-						remote.stop();
-						this.cancel();
-					} }, request.getRuntime()); 
+				if(remote!=null){
+					Timer timer=new Timer();
+					timer.schedule(new TimerTask(){
+						@Override
+						public void run() {
+							remote.stop();
+							this.cancel();
+						} }, request.getRuntime()); 
+				}
 				
 			} }, 0, 5000);
 		

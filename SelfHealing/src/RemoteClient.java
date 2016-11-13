@@ -20,8 +20,8 @@ public class RemoteClient implements Remote{
 		return controller.stop(Edge_ID, PM_ID, VM_ID);
 	}
 
-	public boolean move(int x, int y) {
-		return controller.move(x, y);
+	public Remote move(int x, int y) {
+		return controller.move(Edge_ID, PM_ID, VM_ID, x, y);
 	}
 
 	public void setController(RemoteController controller) {

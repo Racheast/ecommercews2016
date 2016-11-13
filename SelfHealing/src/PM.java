@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import Interfaces.SpecificationElement;
+
 public class PM{
 	private HashMap<Integer,VM> vms=new HashMap<Integer,VM>();
 	private static int id_counter=1;
@@ -31,10 +33,16 @@ public class PM{
 		this.size = size;
 	}
 
-	public RemoteClient startApplication(Request request){
-		VM vm=new VM(request);
+	public RemoteClient startApplication(SpecificationElement specificationElement){
+		VM vm=new VM(specificationElement);
 		vms.put(vm.getID(),vm);
-		System.out.println("VM"+vm.getID()+" for Request"+request.getID()+" created!");
+		String s="";
+		if(specificationElement instanceof Request)
+			s="Request";
+		else if(specificationElement instanceof VM)
+			s="VM";
+		
+		System.out.println("VM"+vm.getID()+" for "+s+specificationElement.getID()+" created!");
 		RemoteClient remoteClient=new RemoteClient();
 		remoteClient.setVM_ID(vm.getID());
 		remoteClient.setPM_ID(this.ID);
@@ -68,7 +76,7 @@ public class PM{
 	public int getConsumed_cpu() {
 		int consumed_cpu=0;
 		for(VM vm:getListOfVMs()){
-			consumed_cpu+=vm.getConsumed_cpu();
+			consumed_cpu+=vm.getCpu();
 		}
 		return consumed_cpu;
 	}
@@ -76,7 +84,7 @@ public class PM{
 	public int getConsumed_memory() {
 		int consumed_memory=0;
 		for(VM vm:getListOfVMs()){
-			consumed_memory+=vm.getConsumed_memory();
+			consumed_memory+=vm.getMemory();
 		}
 		return consumed_memory;
 	}
@@ -84,7 +92,7 @@ public class PM{
 	public int getConsumed_networkBandwith() {
 		int consumed_networkBandwith=0;
 		for(VM vm:getListOfVMs()){
-			consumed_networkBandwith+=vm.getConsumed_networkBandwith();
+			consumed_networkBandwith+=vm.getNetworkBandwidth();
 		}
 		return consumed_networkBandwith;
 	}
@@ -101,9 +109,10 @@ public class PM{
 		this.network_bandwidth = network_bandwidth;
 	}
 
-	public void shutdownVM(int VM_ID){
+	public boolean shutdownVM(int VM_ID){
 		System.out.println("Shutting down VM"+VM_ID+" of Request"+vms.get(VM_ID).getRequest().getID());
 		this.vms.remove(VM_ID);
+		return true;
 	}
 	
 	private ArrayList<VM> getListOfVMs(){
@@ -121,7 +130,7 @@ public class PM{
 		
 		for(int k:keys){
 			VM vm=vms.get(k);
-			u_total+=u_cpu*(vm.getConsumed_cpu()/cpu) + u_mem*(vm.getConsumed_memory()/memory) + u_network*(vm.getConsumed_networkBandwith()/network_bandwidth);
+			u_total+=u_cpu*(vm.getCpu()/cpu) + u_mem*(vm.getMemory()/memory) + u_network*(vm.getNetworkBandwidth()/network_bandwidth);
 		}
 		
 		return u_total;
@@ -129,10 +138,12 @@ public class PM{
 
 	@Override
 	public String toString() {
-		return "PM [vms=" + vms + ", ID=" + ID + ", u0=" + u0 + ", u_cpu=" + u_cpu + ", u_mem=" + u_mem + ", u_network="
-				+ u_network + ", cpu=" + cpu + ", memory=" + memory + ", size=" + size + ", network_bandwidth="
-				+ network_bandwidth + "]";
+		return "PM [ID=" + ID + ", u0=" + u0 + ", u_cpu=" + u_cpu + ", u_mem=" + u_mem + ", u_network=" + u_network
+				+ ", cpu=" + cpu + ", memory=" + memory + ", size=" + size + ", network_bandwidth=" + network_bandwidth
+				+ "]";
 	}
+
+	
 	
 	
 	
