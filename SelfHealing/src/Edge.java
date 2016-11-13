@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.Set;
 
 import Interfaces.LocationElement;
+import Interfaces.Remote;
 
 public class Edge implements LocationElement{
 	private final int ID;
@@ -45,11 +46,10 @@ public class Edge implements LocationElement{
 		this.yCoordinate = yCoordinate;
 	}
 
-	public VM assignRequest(Request request){
+	public RemoteClient assignRequest(Request request){
 		//1. assign application to proper pm
 		//2. allocate a certain amount of available bandwidth to the pm
 
-		//only for test purposes, remove this random selection afterwards
 		ArrayList<PM> pmList=getListOfPMs();
 		
 		int bandwidthSum=0;
@@ -62,9 +62,10 @@ public class Edge implements LocationElement{
 				//(pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= request.getNeeded_bandwidth()
 				if((pm.getCpu() - pm.getConsumed_cpu()) >= request.getNeeded_cpu() && (pm.getMemory()-pm.getConsumed_memory()) >= request.getNeeded_memory() && (pm.getConsumed_networkBandwith()==0 || (pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= request.getNeeded_bandwidth())){
 					pm.setNetwork_bandwidth(request.getNeeded_bandwidth());
-					System.out.println("Assigning request to PM"+pm.getID());
-					VM vm=pm.startApplication(request);
-					return vm;
+					System.out.println("Assigning Request"+request.getID()+" to PM"+pm.getID());
+					RemoteClient remoteClient=pm.startApplication(request);
+					remoteClient.setEdge_ID(this.ID);
+					return remoteClient;
 				}
 			}
 		}

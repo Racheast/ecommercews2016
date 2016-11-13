@@ -1,10 +1,12 @@
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class VM implements Runnable{
+public class VM{
 	//
 	private final int ID;
 	private static int id_counter=1;
+	
+	private Request request;
 	private int size;
 	private int consumed_cpu;
 	private int consumed_memory;
@@ -14,6 +16,7 @@ public class VM implements Runnable{
 		
 	public VM(Request request){
 		this.ID=id_counter++;
+		this.request=request;
 		this.size=request.getNeeded_size();
 		this.consumed_cpu=request.getNeeded_cpu();
 		this.consumed_memory=request.getNeeded_memory();
@@ -66,19 +69,9 @@ public class VM implements Runnable{
 	public int getID(){
 		return this.ID;
 	}
-
-	@Override
-	public void run() {
-		
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask(){
-			@Override
-			public void run() {
-				//stop the VM and release specs in PM/edge
-			} }, 0, runtime);
-		
+	public Request getRequest(){
+		return this.request;
 	}
-	
-	
+
 	
 }

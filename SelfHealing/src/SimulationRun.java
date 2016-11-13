@@ -5,6 +5,8 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import Interfaces.Remote;
+
 public class SimulationRun implements Runnable{
 	private final int x_max;
 	private final int y_max;
@@ -81,7 +83,9 @@ public class SimulationRun implements Runnable{
 		int needed_cpu=(int) Math.round(rand.nextGaussian() * 15 + 1500);
 		int needed_bandwidth=(int) Math.round(rand.nextGaussian() * 15 + 1500);
 		int needed_size=(int) Math.round(rand.nextGaussian() * 1.75 + 1);
-		int runtime=(int) Math.round(rand.nextGaussian() * 15 + 5000);  //runtime 5000msec = 5seconds in average
+		int runtime=(int) Math.round(rand.nextGaussian() * 7000 + 10000);  //runtime 10000msec = 10seconds in average
+		if(runtime<0)
+			runtime*=(-1);
 		int x_coordinate=rand.nextInt(x_max);
 		int y_coordinate=rand.nextInt(y_max);
 		return new Request(needed_memory,needed_cpu,needed_bandwidth,needed_size,runtime,x_coordinate,y_coordinate);
@@ -93,17 +97,23 @@ public class SimulationRun implements Runnable{
 		EdgeController controller=initEdgeController();
 		System.out.println("**Initialized map**");
 		System.out.println(controller.printMap());
-		ArrayList<VM> vms=new ArrayList<VM>();
 		
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask(){
 			@Override
 			public void run() {
 				Request request=generateRequest();
-				System.out.println(request);
-				VM vm=controller.sendRequest(request);
-				if(vm!=null)
-					vms.add(vm);
+				System.out.println("\n"+request);
+				Remote remote=controller.sendRequest(request);
+				
+				Timer timer=new Timer();
+				timer.schedule(new TimerTask(){
+					@Override
+					public void run() {
+						remote.stop();
+						this.cancel();
+					} }, request.getRuntime()); 
+				
 			} }, 0, 5000);
 		
 		

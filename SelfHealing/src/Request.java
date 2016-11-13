@@ -1,6 +1,8 @@
 import Interfaces.LocationElement;
 
 public class Request implements LocationElement{
+	private static int id_counter=1;
+	private final int ID;
 	private int needed_memory;
 	private int needed_cpu;
 	private int needed_bandwidth;
@@ -13,6 +15,7 @@ public class Request implements LocationElement{
 	public Request(int needed_memory, int needed_cpu, int needed_bandwidth, int needed_size, int runtime,
 			int xCoordinate, int yCoordinate) {
 		super();
+		this.ID=id_counter++;
 		this.needed_memory = needed_memory;
 		this.needed_cpu = needed_cpu;
 		this.needed_bandwidth = needed_bandwidth;
@@ -65,12 +68,18 @@ public class Request implements LocationElement{
 		this.yCoordinate = yCoordinate;
 	}
 	
+	public int getID(){
+		return this.ID;
+	}
+	
 	@Override
 	public String toString() {
-		return "Request [needed_memory=" + needed_memory + ", needed_cpu=" + needed_cpu + ", needed_bandwidth="
-				+ needed_bandwidth + ", needed_size=" + needed_size + ", runtime=" + runtime + ", xCoordinate="
-				+ xCoordinate + ", yCoordinate=" + yCoordinate + "]";
+		return "Request [ID=" + ID + ", needed_memory=" + needed_memory + ", needed_cpu=" + needed_cpu
+				+ ", needed_bandwidth=" + needed_bandwidth + ", needed_size=" + needed_size + ", runtime=" + runtime
+				+ ", xCoordinate=" + xCoordinate + ", yCoordinate=" + yCoordinate + "]";
 	}
+	
+	
 	
 	
 }

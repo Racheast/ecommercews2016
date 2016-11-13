@@ -31,11 +31,14 @@ public class PM{
 		this.size = size;
 	}
 
-	public VM startApplication(Request request){
+	public RemoteClient startApplication(Request request){
 		VM vm=new VM(request);
 		vms.put(vm.getID(),vm);
-		System.out.println("VM"+vm.getID()+" created!");
-		return vm;
+		System.out.println("VM"+vm.getID()+" for Request"+request.getID()+" created!");
+		RemoteClient remoteClient=new RemoteClient();
+		remoteClient.setVM_ID(vm.getID());
+		remoteClient.setPM_ID(this.ID);
+		return remoteClient;
 	}
 	
 	public HashMap<Integer, VM> getVms() {
@@ -98,9 +101,9 @@ public class PM{
 		this.network_bandwidth = network_bandwidth;
 	}
 
-	public void shutdownVM(int id){
-		System.out.println("shutting down VM"+this.getID());
-		this.vms.remove(id);
+	public void shutdownVM(int VM_ID){
+		System.out.println("Shutting down VM"+VM_ID+" of Request"+vms.get(VM_ID).getRequest().getID());
+		this.vms.remove(VM_ID);
 	}
 	
 	private ArrayList<VM> getListOfVMs(){

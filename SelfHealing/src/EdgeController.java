@@ -5,16 +5,21 @@ import java.util.List;
 import java.util.Random;
 
 import Interfaces.LocationElement;
+import Interfaces.Remote;
+import Interfaces.RemoteController;
 
-public class EdgeController{
+public class EdgeController implements RemoteController{
+	private HashMap<Integer, Edge> edges;
 	private Edge[][] map;
 	
 	public EdgeController(){
 		map=new Edge[100][100];
+		edges=new HashMap<Integer,Edge>();
 	}
 	
 	public EdgeController(int x_max, int y_max){
-		map=new Edge[x_max][y_max];		
+		map=new Edge[x_max][y_max];
+		edges=new HashMap<Integer,Edge>();
 	}
 
 	public Edge[][] getMap() {
@@ -26,10 +31,11 @@ public class EdgeController{
 	}
 	
 	public void addEdge(int x, int y, Edge edge){
+		edges.put(edge.getID(), edge);
 		this.map[x][y]=edge;
 	}
 	
-	public VM sendRequest(Request request){
+	public Remote sendRequest(Request request){
 		//TODO: allocate application to proper edge
 		
 		/*
@@ -37,18 +43,20 @@ public class EdgeController{
 		 * 2. run through sorted Edge list and check whether this edge has free specs
 		 * 3. assign request to the nearest free edge and return true or return false
 		 */
-		VM vm=null;
-		ArrayList<Edge> sortedEdges=this.generateSortedDistanceList(this.getEdges(), request);
+		RemoteClient remoteClient=null;
+		ArrayList<Edge> sortedEdges=this.generateSortedDistanceList(this.getListOfEdges(), request);
 		
 		for(Edge e:sortedEdges){
-			System.out.println("Request forwarded to edge"+e.getID());
-			vm=e.assignRequest(request);
+			System.out.println("Request"+request.getID()+" forwarded to edge"+e.getID());
+			remoteClient=e.assignRequest(request);
+			remoteClient.setController(this);
+			return remoteClient;
 		}
 		
-		if(vm==null)
+		if(remoteClient==null)
 			System.out.println("No proper edges found!");
 		
-		return vm;
+		return remoteClient;
 	}
 	
 	private ArrayList<Edge> generateSortedDistanceList(ArrayList<Edge> edges, Request request){
@@ -62,7 +70,7 @@ public class EdgeController{
 		Collections.sort(comparableEdges);
 		
 		for(ComparableEdge ce:comparableEdges){
-			System.out.println("C.Edge"+ce.getEdge().getID()+"("+ce.getEdge().getxCoordinate()+","+ce.getEdge().getyCoordinate()+"), distance="+ce.getDistance());
+			//System.out.println("C.Edge"+ce.getEdge().getID()+"("+ce.getEdge().getxCoordinate()+","+ce.getEdge().getyCoordinate()+"), distance="+ce.getDistance());
 			sortedEdges.add(ce.getEdge());
 		}
 		return sortedEdges;
@@ -93,7 +101,7 @@ public class EdgeController{
 		return output;
 	}
 	
-	public ArrayList<Edge> getEdges(){
+	public ArrayList<Edge> getListOfEdges(){
 		ArrayList<Edge> edges=new ArrayList<Edge>();
 		for(int x=0; x<map.length; x++){
 			for(int y=0; y<map[0].length; y++){
@@ -118,5 +126,27 @@ public class EdgeController{
 			
 		return r;
 	}
+	
+	@Override
+	public boolean stop(int Edge_ID, int PM_ID, int VM_ID) {
+		Edge edge=edges.get(Edge_ID);
+		if(edge!=null){
+			PM pm=edge.getPms().get(PM_ID);
+			if(pm!=null){
+				if(pm.getVms().get(VM_ID)!=null){
+					pm.shutdownVM(VM_ID);
+				}
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean move(int x, int y) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
 	
 }
