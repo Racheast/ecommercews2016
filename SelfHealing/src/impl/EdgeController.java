@@ -36,7 +36,7 @@ public class EdgeController implements RemoteController{
 		this.map[x][y]=edge;
 	}
 	
-	public synchronized RemoteClient sendRequest(Request request){
+	public synchronized RemoteClient sendRequest(VM vm){
 		//TODO: allocate application to proper edge
 		
 		/*
@@ -44,21 +44,21 @@ public class EdgeController implements RemoteController{
 		 * 2. run through sorted Edge list and check whether this edge has free specs
 		 * 3. assign request to the nearest free edge and return true or return false
 		 */
-		ArrayList<Edge> sortedEdges=this.generateSortedDistanceList(this.getListOfEdges(), request);
+		ArrayList<Edge> sortedEdges=this.generateSortedDistanceList(this.getListOfEdges(), vm.getRequest());
 		
 		for(Edge e:sortedEdges){
-			System.out.println("SEND REQUEST OPERATION: Request"+request.getID()+" forwarded to edge"+e.getID()+"\n");
-			Address address=e.assignRequest(request);
+			System.out.println("CONTROLLER: SEND REQUEST OPERATION: Request"+vm.getRequest().getID()+" forwarded to edge"+e.getID()+"\n");
+			VM newVM=e.assignRequest(vm);
 			
-			if(address!=null){
+			if(newVM!=null){
 				RemoteClient remoteClient=new RemoteClient();
-				remoteClient.setCurrentAddress(address);
+				remoteClient.setVM(newVM);
 				remoteClient.setController(this);
 				return remoteClient;
 			}
 		}
 		
-		System.out.println("SEND REQUEST OPERATION: No proper edges found!\n");
+		System.out.println("CONTROLLER: SEND REQUEST OPERATION: No proper edges found!\n");
 		return null;
 	}
 	
@@ -136,26 +136,24 @@ public class EdgeController implements RemoteController{
 	}
 	
 	@Override
-	public boolean stop(Address currentAddress) {
-		Edge edge=edges.get(currentAddress.getEdge_ID());
+	public boolean stop(VM vm) {
+		System.out.println("CONTROLLER: Shutting down "+vm.compactString()+"\n");
+		Edge edge=edges.get(vm.getAddress().getEdge_ID());
 		if(edge!=null){
-			PM pm=edge.getPms().get(currentAddress.getPM_ID());
+			PM pm=edge.getPms().get(vm.getAddress().getPM_ID());
 			if(pm!=null){
-				if(pm.getVms().get(currentAddress.getVM_ID())!=null){
-					return pm.shutdownVM(currentAddress.getVM_ID());
-				}
+					return pm.shutdownVM(vm.getID());
 			}
 		}
 		return false;
 	}
 
 	@Override
-	public synchronized Address move(Address currentAddress, int x, int y) {
-		Edge edge=edges.get(currentAddress.getEdge_ID());
+	public synchronized VM move(VM vm, int x, int y) {
+		Edge edge=edges.get(vm.getAddress().getEdge_ID());
 		if(edge!=null){
-			PM pm=edge.getPms().get(currentAddress.getPM_ID());
+			PM pm=edge.getPms().get(vm.getAddress().getPM_ID());
 			if(pm!=null){
-				VM vm=pm.getVms().get(currentAddress.getVM_ID());
 				if(vm!=null){
 					//System.out.println("CONTROLLER: Moving VM"+vm.getID()+" of Request"+vm.getRequest().getID()+" from ("+vm.getRequest().getxCoordinate()+"/"+vm.getRequest().getyCoordinate()+") to ("+x+"/"+y+")");
 					System.out.println("CONTROLLER: Moving VM"+vm.getID()+" of Request"+vm.getRequest().getID()+"\n");
@@ -164,17 +162,18 @@ public class EdgeController implements RemoteController{
 					
 					for(Edge e:sortedEdges){
 						System.out.println("CONTROLLER: MOVE OPERATION: VM"+vm.getID()+" forwarded to edge"+e.getID()+"\n");
-						Address newAddress=e.assignRequest(vm);
-						if(newAddress!=null){
-							System.out.println("CONTROLLER: MOVE OPERATION: VM moved from "+currentAddress.compactString()+" to "+newAddress.compactString()+"\n");
-							return newAddress;
+						VM newVM=e.assignRequest(vm);
+						if(newVM!=null){
+							System.out.println("CONTROLLER: MOVE OPERATION: VM moved from "+vm.getAddress().compactString()+" to "+newVM.getAddress().compactString()+"\n");
+							stop(vm);
+							return newVM;
 						}
 					}
 				}
 			}
 		}
-		System.out.println("MOVE OPERATION: No proper edges found! VM stayed on "+currentAddress.compactString()+"\n");
-		return currentAddress;  //Return the old address if new edge could not be found
+		System.out.println("MOVE OPERATION: No proper edges found! VM stayed on "+vm.getAddress().compactString()+"\n");
+		return vm;  //Return the old vm if new edge could not be found
 	}
 
 

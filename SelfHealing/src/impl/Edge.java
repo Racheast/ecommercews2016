@@ -40,29 +40,28 @@ public class Edge implements LocationElement{
 		return yCoordinate;
 	}
 
-	public synchronized Address assignRequest(SpecificationElement specificationElement){
+	public synchronized VM assignRequest(VM vm){
 		//1. assign application to proper pm
 		//2. allocate a certain amount of available bandwidth to the pm
-
+		
 		ArrayList<PM> pmList=getListOfPMs();
+		
+		for(PM pm:pmList){
+			if(pm.getVms().containsKey(vm.getID()))
+				return vm;
+		}
 		
 		int bandwidthSum=getConsumedBandwidth();
 		
-		if((this.bandwidth - bandwidthSum) >= specificationElement.getNetworkBandwidth()){
+		if((this.bandwidth - bandwidthSum) >= vm.getNetworkBandwidth()){
 			for(PM pm:pmList){
-				if((pm.getCpu() - pm.getConsumed_cpu()) >= specificationElement.getCpu() && (pm.getMemory()-pm.getConsumed_memory()) >= specificationElement.getMemory() && (pm.getConsumed_networkBandwith()==0 || (pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= specificationElement.getNetworkBandwidth())){
-					pm.setNetwork_bandwidth(specificationElement.getNetworkBandwidth());
-					String s="";
-					
-					if(specificationElement instanceof Request)
-						s="Request";
-					else if(specificationElement instanceof VM)
-						s="VM";
-					
-					System.out.println("EDGE"+this.ID+": Assigning "+s+specificationElement.getID()+" to PM"+pm.getID()+"\n");
-					Address newAddress=pm.startApplication(specificationElement);
-					newAddress.setEdge_ID(this.ID);
-					return newAddress;
+				if((pm.getCpu() - pm.getConsumed_cpu()) >= vm.getCpu() && (pm.getMemory()-pm.getConsumed_memory()) >= vm.getMemory() && (pm.getConsumed_networkBandwith()==0 || (pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= vm.getNetworkBandwidth())){
+					pm.setNetwork_bandwidth(vm.getNetworkBandwidth());
+				
+					System.out.println(this.compactString()+": Assigning "+vm.compactString()+" of "+vm.getRequest().compactString() + " to "+pm.compactString()+"\n");
+					VM newVM=pm.startApplication(vm);
+					newVM.getAddress().setEdge_ID(this.ID);
+					return newVM;
 				}
 			}
 		}
@@ -117,6 +116,10 @@ public class Edge implements LocationElement{
 	public String toString() {
 		return "Edge [ID=" + ID + ", pms=" + pms + ", xCoordinate=" + xCoordinate + ", yCoordinate=" + yCoordinate
 				+ ", u0=" + u0 + ", bandwidth=" + bandwidth + "]";
+	}
+	
+	public String compactString(){
+		return "Edge"+ID;
 	}
 	
 }

@@ -4,56 +4,44 @@ import java.util.TimerTask;
 
 import Interfaces.SpecificationElement;
 
-public class VM implements SpecificationElement{
+public class VM {
 	//
 	private final int ID;
 	private static int id_counter=1;
 	
 	private Request request;
+	private Address address;
+	
 	private int size;
 	private int consumed_cpu;
 	private int consumed_memory;
 	private int consumed_networkBandwith;  //depends on the consumed memory
 	private int runtime;
 	private double page_dirtying_rate;  //depends linearly on the combination of the utilized memory, cpu and nw_bandwidth
-		
-	public VM(Request request){
-		this((SpecificationElement)request);
-		this.request=request;
-		this.runtime=request.getRuntime(); //TODO: calculate real value via formula
-	}
-	
+
 	public VM(VM vm){
 		this.ID=id_counter++;
+		this.request=vm.getRequest();
 		this.size=vm.getSize();
 		this.consumed_cpu=vm.getCpu();
 		this.consumed_memory=vm.getMemory();
 		this.consumed_networkBandwith=vm.getNetworkBandwidth();
-		this.page_dirtying_rate=0.2; //TODO: calculate real value via formula
-		this.request=vm.getRequest();
+		this.runtime=vm.getRuntime();
+		this.page_dirtying_rate=2.0;
 	}
 	
-	public VM(SpecificationElement specificationElement){
+	public VM(Request request, int size, int consumed_cpu, int consumed_memory, int consumed_networkBandwith,
+			int runtime) {
 		this.ID=id_counter++;
-		this.size=specificationElement.getSize();
-		this.consumed_cpu=specificationElement.getCpu();
-		this.consumed_memory=specificationElement.getMemory();
-		this.consumed_networkBandwith=specificationElement.getNetworkBandwidth();
-		this.page_dirtying_rate=0.2; //TODO: calculate real value via formula
-		this.request=specificationElement.getRequest();
-	}
-	
-	public VM(int size, int consumed_cpu, int consumed_memory, int runtime) {
-		super();
-		this.ID=id_counter++;
+		this.request = request;
 		this.size = size;
 		this.consumed_cpu = consumed_cpu;
 		this.consumed_memory = consumed_memory;
+		this.consumed_networkBandwith = consumed_networkBandwith;
 		this.runtime = runtime;
-		this.consumed_networkBandwith=10;  //TODO: calculate real value via formula
-		this.page_dirtying_rate=0.2;  //TODO: calculate real value via formula
+		this.page_dirtying_rate=2.0;
 	}
-
+	
 	public int getRuntime() {
 		return runtime;
 	}
@@ -90,15 +78,25 @@ public class VM implements SpecificationElement{
 	public Request getRequest(){
 		return this.request;
 	}
+	
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
 
 	@Override
 	public String toString() {
-		return "VM [ID=" + ID + ", request=" + request.getID() + ", size=" + size + ", consumed_cpu=" + consumed_cpu
+		return "VM [ID=" + ID + ", request=" + request + ", size=" + size + ", consumed_cpu=" + consumed_cpu
 				+ ", consumed_memory=" + consumed_memory + ", consumed_networkBandwith=" + consumed_networkBandwith
 				+ ", runtime=" + runtime + ", page_dirtying_rate=" + page_dirtying_rate + "]";
 	}
-
-
+	
+	public String compactString(){
+		return "VM"+ID;
+	}
 
 	
 }

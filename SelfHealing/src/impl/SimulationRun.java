@@ -78,18 +78,22 @@ public class SimulationRun implements Runnable{
 		return pms;
 	}
 	
+	private VM generateVM(){
+		Random rand=new Random();
+		int needed_memory=Math.abs((int) Math.round(rand.nextGaussian() * 15 + 1000));
+		int needed_cpu=Math.abs((int) Math.round(rand.nextGaussian() * 15 + 1500));
+		int needed_bandwidth=Math.abs((int) Math.round(rand.nextGaussian() * 15 + 1500));
+		int needed_size=Math.abs((int) Math.round(rand.nextGaussian() * 1.75 + 1));
+		int runtime=Math.abs((int) Math.round(rand.nextGaussian() * 7000 + 10000));  //runtime 10000msec = 10seconds in average
+				
+		return new VM(generateRequest(),needed_size,needed_cpu,needed_memory,needed_bandwidth,runtime);
+	}
+	
 	private Request generateRequest(){
 		Random rand=new Random();
-		int needed_memory=(int) Math.round(rand.nextGaussian() * 15 + 1000);
-		int needed_cpu=(int) Math.round(rand.nextGaussian() * 15 + 1500);
-		int needed_bandwidth=(int) Math.round(rand.nextGaussian() * 15 + 1500);
-		int needed_size=(int) Math.round(rand.nextGaussian() * 1.75 + 1);
-		int runtime=(int) Math.round(rand.nextGaussian() * 7000 + 10000);  //runtime 10000msec = 10seconds in average
-		if(runtime<0)
-			runtime*=(-1);
-		int x_coordinate=rand.nextInt(x_max);
-		int y_coordinate=rand.nextInt(y_max);
-		return new Request(needed_memory,needed_cpu,needed_bandwidth,needed_size,runtime,x_coordinate,y_coordinate);
+		int xCoordinate=rand.nextInt(x_max);
+		int yCoordinate=rand.nextInt(y_max);
+		return new Request(xCoordinate,yCoordinate);
 	}
 	
 	@Override
@@ -99,9 +103,10 @@ public class SimulationRun implements Runnable{
 		EdgeController controller=initEdgeController();
 		System.out.println(controller.printMap()+"\n");
 		
-		Request request=generateRequest();
-		System.out.println("SIMULATOR: Request generated: "+request+"\n");
-		Remote remote=controller.sendRequest(request);
+		VM vm=generateVM();
+		System.out.println("SIMULATOR: Request generated: "+vm+"\n");
+		
+		Remote remote=controller.sendRequest(vm);
 		
 		if(remote!=null){
 			Timer timer=new Timer();
@@ -109,17 +114,34 @@ public class SimulationRun implements Runnable{
 				@Override
 				public void run() {
 					Random rand=new Random();
-					int x=request.getxCoordinate();
-					int y=request.getyCoordinate();
-					int move_X=rand.nextInt(3)+1;
-					int move_Y=rand.nextInt(3)+1;
-					request.setxCoordinate(x+move_X);
-					request.setyCoordinate(y+move_Y);
-					System.out.println("SIMULATOR: Moving Request"+request.getID()+" from ("+x+"/"+y+") to ("+request.getxCoordinate()+"/"+request.getyCoordinate()+")\n");
-					remote.move(request.getxCoordinate(), request.getyCoordinate());
+					int x=vm.getRequest().getxCoordinate();
+					int y=vm.getRequest().getyCoordinate();
+					int move_X=(int) Math.round(rand.nextGaussian() * 5);
+					int move_Y=(int) Math.round(rand.nextGaussian() * 5);
+					int new_x=x+move_X;
+					int new_y=y+move_Y;
 					
-				} },0, 6000); //moving every 6seconds
+					if(new_x >= x_max){
+						new_x=x_max-1;
+					}else if(new_x < 0){
+						new_x=0;
+					}
+					
+					if(new_y >= y_max){
+						new_y=y_max-1;
+					}else if(new_y < 0){
+						new_y=0;
+					}
+					
+					vm.getRequest().setxCoordinate(new_x);
+					vm.getRequest().setyCoordinate(new_y);
+					
+					System.out.println("SIMULATOR: Moving "+vm.getRequest().compactString()+" from ("+x+"/"+y+") to ("+vm.getRequest().getxCoordinate()+"/"+vm.getRequest().getyCoordinate()+")\n");
+					remote.move(vm.getRequest().getxCoordinate(), vm.getRequest().getyCoordinate());
+					
+				} },0, 1000); //moving every 6seconds
 		}
+		
 		
 		/*
 		Timer timer = new Timer();
@@ -175,6 +197,7 @@ public class SimulationRun implements Runnable{
 			*/
 	}
 	
+	/*
 	private void shutDown(Remote remote, Request request){
 		Timer timer=new Timer();
 		timer.schedule(new TimerTask(){
@@ -184,7 +207,7 @@ public class SimulationRun implements Runnable{
 				this.cancel();
 			} }, request.getRuntime()); 
 	}
-	
+	*/
 	
 	/*
 	 * TODO: Simulate Failures

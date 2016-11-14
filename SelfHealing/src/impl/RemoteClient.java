@@ -4,31 +4,32 @@ import Interfaces.RemoteController;
 
 public class RemoteClient implements Remote{
 	private RemoteController controller;
-	private Address currentAddress;
+	private VM vm;
 	
 	public RemoteClient(){
-		
+		this.controller=null;
+		this.vm=null;
 	}
 	
-	public RemoteClient(Address currentAddress) {
-		this.currentAddress=currentAddress;
+	public RemoteClient(VM vm) {
+		this.vm=vm;
 	}
 	
 	
 	public boolean stop(){
-		return controller.stop(currentAddress);
+		return controller.stop(vm);
 	}
 
 	public void move(int x, int y) {
-		this.currentAddress=controller.move(currentAddress, x, y);
+		this.vm=controller.move(vm, x, y);
 	}
 
 	public void setController(RemoteController controller) {
 		this.controller = controller;
 	}
 
-	public void setCurrentAddress(Address currentAddress) {
-		this.currentAddress = currentAddress;
-	}	
-	
+	public void setVM(VM vm){
+		this.vm=vm;
+	}
+		
 }

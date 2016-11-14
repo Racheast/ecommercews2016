@@ -28,20 +28,14 @@ public class PM{
 		this.size = size;
 	}
 
-	public Address startApplication(SpecificationElement specificationElement){
-		VM vm=new VM(specificationElement);
-		vms.put(vm.getID(),vm);
-		String s="";
-		if(specificationElement instanceof Request)
-			s="Request";
-		else if(specificationElement instanceof VM)
-			s="VM";
-		
-		System.out.println("PM"+this.ID+": VM"+vm.getID()+" for "+s+specificationElement.getID()+" created!\n");
-		Address newAddress=new Address();
-		newAddress.setVM_ID(vm.getID());
-		newAddress.setPM_ID(this.ID);
-		return newAddress;
+	public VM startApplication(VM vm){
+		VM newVM=new VM(vm);
+		Address address=new Address();
+		newVM.setAddress(address);
+		newVM.getAddress().setPM_ID(this.ID);
+		vms.put(vm.getID(),newVM);
+		System.out.println(this.compactString()+": "+newVM.compactString()+" for "+vm.compactString()+" of "+vm.getRequest().compactString()+" created!\n");		
+		return newVM;
 	}
 	
 	public HashMap<Integer, VM> getVms() {
@@ -105,8 +99,8 @@ public class PM{
 	}
 
 	public boolean shutdownVM(int VM_ID){
-		System.out.println("Shutting down VM"+VM_ID+" of Request"+vms.get(VM_ID).getRequest().getID());
 		this.vms.remove(VM_ID);
+		System.out.println(this.compactString()+": VM"+VM_ID+" shut down.\n");
 		return true;
 	}
 	
@@ -138,7 +132,9 @@ public class PM{
 				+ "]";
 	}
 
-	
+	public String compactString(){
+		return "PM"+ID;
+	}
 	
 	
 	
