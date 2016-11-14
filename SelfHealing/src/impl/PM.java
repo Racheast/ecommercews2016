@@ -1,3 +1,4 @@
+package impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -15,13 +16,7 @@ public class PM{
 	private int memory;
 	private int size;
 	private int network_bandwidth; //mbit per sec
-	/*
-	private int consumed_cpu;
-	private int consumed_memory;
-	private int consumed_networkBandwith;
-	*/
-	
-	
+		
 	public PM(double u0, double u_cpu, double u_mem, double u_network, int cpu, int memory, int size) {
 		this.ID=id_counter++;
 		this.u0=u0;
@@ -33,7 +28,7 @@ public class PM{
 		this.size = size;
 	}
 
-	public RemoteClient startApplication(SpecificationElement specificationElement){
+	public Address startApplication(SpecificationElement specificationElement){
 		VM vm=new VM(specificationElement);
 		vms.put(vm.getID(),vm);
 		String s="";
@@ -42,11 +37,11 @@ public class PM{
 		else if(specificationElement instanceof VM)
 			s="VM";
 		
-		System.out.println("VM"+vm.getID()+" for "+s+specificationElement.getID()+" created!");
-		RemoteClient remoteClient=new RemoteClient();
-		remoteClient.setVM_ID(vm.getID());
-		remoteClient.setPM_ID(this.ID);
-		return remoteClient;
+		System.out.println("PM"+this.ID+": VM"+vm.getID()+" for "+s+specificationElement.getID()+" created!\n");
+		Address newAddress=new Address();
+		newAddress.setVM_ID(vm.getID());
+		newAddress.setPM_ID(this.ID);
+		return newAddress;
 	}
 	
 	public HashMap<Integer, VM> getVms() {

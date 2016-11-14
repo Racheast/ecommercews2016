@@ -1,3 +1,4 @@
+package impl;
 
 public class ComparableEdge implements Comparable<ComparableEdge> {
 	private final Edge edge;

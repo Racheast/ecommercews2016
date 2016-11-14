@@ -1,3 +1,4 @@
+package impl;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -20,14 +21,16 @@ public class VM implements SpecificationElement{
 		this((SpecificationElement)request);
 		this.request=request;
 		this.runtime=request.getRuntime(); //TODO: calculate real value via formula
-		/*
+	}
+	
+	public VM(VM vm){
 		this.ID=id_counter++;
-		this.size=request.getSize();
-		this.consumed_cpu=request.getCpu();
-		this.consumed_memory=request.getMemory();
-		this.consumed_networkBandwith=request.getNetworkBandwidth();
+		this.size=vm.getSize();
+		this.consumed_cpu=vm.getCpu();
+		this.consumed_memory=vm.getMemory();
+		this.consumed_networkBandwith=vm.getNetworkBandwidth();
 		this.page_dirtying_rate=0.2; //TODO: calculate real value via formula
-		*/
+		this.request=vm.getRequest();
 	}
 	
 	public VM(SpecificationElement specificationElement){
@@ -37,6 +40,7 @@ public class VM implements SpecificationElement{
 		this.consumed_memory=specificationElement.getMemory();
 		this.consumed_networkBandwith=specificationElement.getNetworkBandwidth();
 		this.page_dirtying_rate=0.2; //TODO: calculate real value via formula
+		this.request=specificationElement.getRequest();
 	}
 	
 	public VM(int size, int consumed_cpu, int consumed_memory, int runtime) {

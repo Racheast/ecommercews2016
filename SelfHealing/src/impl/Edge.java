@@ -1,3 +1,4 @@
+package impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -39,20 +40,16 @@ public class Edge implements LocationElement{
 		return yCoordinate;
 	}
 
-	public synchronized RemoteClient assignRequest(SpecificationElement specificationElement){
+	public synchronized Address assignRequest(SpecificationElement specificationElement){
 		//1. assign application to proper pm
 		//2. allocate a certain amount of available bandwidth to the pm
 
 		ArrayList<PM> pmList=getListOfPMs();
 		
-		int bandwidthSum=0;
-		for(PM pm:pmList){
-			bandwidthSum+=pm.getNetwork_bandwidth();
-		}
+		int bandwidthSum=getConsumedBandwidth();
 		
 		if((this.bandwidth - bandwidthSum) >= specificationElement.getNetworkBandwidth()){
 			for(PM pm:pmList){
-				//(pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= request.getNeeded_bandwidth()
 				if((pm.getCpu() - pm.getConsumed_cpu()) >= specificationElement.getCpu() && (pm.getMemory()-pm.getConsumed_memory()) >= specificationElement.getMemory() && (pm.getConsumed_networkBandwith()==0 || (pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= specificationElement.getNetworkBandwidth())){
 					pm.setNetwork_bandwidth(specificationElement.getNetworkBandwidth());
 					String s="";
@@ -62,14 +59,14 @@ public class Edge implements LocationElement{
 					else if(specificationElement instanceof VM)
 						s="VM";
 					
-					System.out.println("Assigning "+s+specificationElement.getID()+" to PM"+pm.getID());
-					RemoteClient remoteClient=pm.startApplication(specificationElement);
-					remoteClient.setEdge_ID(this.ID);
-					return remoteClient;
+					System.out.println("EDGE"+this.ID+": Assigning "+s+specificationElement.getID()+" to PM"+pm.getID()+"\n");
+					Address newAddress=pm.startApplication(specificationElement);
+					newAddress.setEdge_ID(this.ID);
+					return newAddress;
 				}
 			}
 		}
-		System.out.println("No available PM found in edge"+this.ID);
+		System.out.println("EDGE"+this.ID+": No available PM found!\n");
 		return null;
 	}
 	
@@ -105,6 +102,15 @@ public class Edge implements LocationElement{
 			pmList.add(pms.get(key));
 		}
 		return pmList;
+	}
+	
+	private synchronized int getConsumedBandwidth(){
+		ArrayList<PM> pmList=getListOfPMs();
+		int bandwidthSum=0;
+		for(PM pm:pmList){
+			bandwidthSum+=pm.getNetwork_bandwidth();
+		}
+		return bandwidthSum;
 	}
 	
 	@Override

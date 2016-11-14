@@ -1,3 +1,4 @@
+package impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ public class EdgeController implements RemoteController{
 		this.map[x][y]=edge;
 	}
 	
-	public synchronized Remote sendRequest(Request request){
+	public synchronized RemoteClient sendRequest(Request request){
 		//TODO: allocate application to proper edge
 		
 		/*
@@ -46,15 +47,18 @@ public class EdgeController implements RemoteController{
 		ArrayList<Edge> sortedEdges=this.generateSortedDistanceList(this.getListOfEdges(), request);
 		
 		for(Edge e:sortedEdges){
-			System.out.println("Request"+request.getID()+" forwarded to edge"+e.getID());
-			RemoteClient remoteClient=e.assignRequest(request);
-			if(remoteClient!=null){
+			System.out.println("SEND REQUEST OPERATION: Request"+request.getID()+" forwarded to edge"+e.getID()+"\n");
+			Address address=e.assignRequest(request);
+			
+			if(address!=null){
+				RemoteClient remoteClient=new RemoteClient();
+				remoteClient.setCurrentAddress(address);
 				remoteClient.setController(this);
 				return remoteClient;
 			}
 		}
 		
-		System.out.println("No proper edges found!");
+		System.out.println("SEND REQUEST OPERATION: No proper edges found!\n");
 		return null;
 	}
 	
@@ -132,13 +136,13 @@ public class EdgeController implements RemoteController{
 	}
 	
 	@Override
-	public boolean stop(int Edge_ID, int PM_ID, int VM_ID) {
-		Edge edge=edges.get(Edge_ID);
+	public boolean stop(Address currentAddress) {
+		Edge edge=edges.get(currentAddress.getEdge_ID());
 		if(edge!=null){
-			PM pm=edge.getPms().get(PM_ID);
+			PM pm=edge.getPms().get(currentAddress.getPM_ID());
 			if(pm!=null){
-				if(pm.getVms().get(VM_ID)!=null){
-					return pm.shutdownVM(VM_ID);
+				if(pm.getVms().get(currentAddress.getVM_ID())!=null){
+					return pm.shutdownVM(currentAddress.getVM_ID());
 				}
 			}
 		}
@@ -146,25 +150,31 @@ public class EdgeController implements RemoteController{
 	}
 
 	@Override
-	public synchronized RemoteClient move(int Edge_ID, int PM_ID, int VM_ID, int x, int y) {
-		Edge edge=edges.get(Edge_ID);
+	public synchronized Address move(Address currentAddress, int x, int y) {
+		Edge edge=edges.get(currentAddress.getEdge_ID());
 		if(edge!=null){
-			PM pm=edge.getPms().get(PM_ID);
+			PM pm=edge.getPms().get(currentAddress.getPM_ID());
 			if(pm!=null){
-				VM vm=pm.getVms().get(VM_ID);
+				VM vm=pm.getVms().get(currentAddress.getVM_ID());
 				if(vm!=null){
+					//System.out.println("CONTROLLER: Moving VM"+vm.getID()+" of Request"+vm.getRequest().getID()+" from ("+vm.getRequest().getxCoordinate()+"/"+vm.getRequest().getyCoordinate()+") to ("+x+"/"+y+")");
+					System.out.println("CONTROLLER: Moving VM"+vm.getID()+" of Request"+vm.getRequest().getID()+"\n");
+					
 					ArrayList<Edge> sortedEdges=generateSortedDistanceList(this.getListOfEdges(), x, y);
 					
 					for(Edge e:sortedEdges){
-						System.out.println("VM"+vm.getID()+" forwarded to edge"+e.getID());
-						RemoteClient remoteClient=e.assignRequest(vm);
-						remoteClient.setController(this);
-						return remoteClient;
+						System.out.println("CONTROLLER: MOVE OPERATION: VM"+vm.getID()+" forwarded to edge"+e.getID()+"\n");
+						Address newAddress=e.assignRequest(vm);
+						if(newAddress!=null){
+							System.out.println("CONTROLLER: MOVE OPERATION: VM moved from "+currentAddress.compactString()+" to "+newAddress.compactString()+"\n");
+							return newAddress;
+						}
 					}
 				}
 			}
 		}
-		return null;
+		System.out.println("MOVE OPERATION: No proper edges found! VM stayed on "+currentAddress.compactString()+"\n");
+		return currentAddress;  //Return the old address if new edge could not be found
 	}
 
 

@@ -1,3 +1,4 @@
+package impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -94,16 +95,39 @@ public class SimulationRun implements Runnable{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		System.out.println("SIMULATOR: Initializing map...");
 		EdgeController controller=initEdgeController();
-		System.out.println("**Initialized map**");
-		System.out.println(controller.printMap());
+		System.out.println(controller.printMap()+"\n");
 		
+		Request request=generateRequest();
+		System.out.println("SIMULATOR: Request generated: "+request+"\n");
+		Remote remote=controller.sendRequest(request);
+		
+		if(remote!=null){
+			Timer timer=new Timer();
+			timer.schedule(new TimerTask(){
+				@Override
+				public void run() {
+					Random rand=new Random();
+					int x=request.getxCoordinate();
+					int y=request.getyCoordinate();
+					int move_X=rand.nextInt(3)+1;
+					int move_Y=rand.nextInt(3)+1;
+					request.setxCoordinate(x+move_X);
+					request.setyCoordinate(y+move_Y);
+					System.out.println("SIMULATOR: Moving Request"+request.getID()+" from ("+x+"/"+y+") to ("+request.getxCoordinate()+"/"+request.getyCoordinate()+")\n");
+					remote.move(request.getxCoordinate(), request.getyCoordinate());
+					
+				} },0, 6000); //moving every 6seconds
+		}
+		
+		/*
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask(){
 			@Override
 			public void run() {
 				Request request=generateRequest();
-				System.out.println("\n"+request);
+				System.out.println("\nSIMULATOR: Request generated: "+request);
 				Remote remote=controller.sendRequest(request);
 				
 				if(remote!=null){
@@ -111,15 +135,56 @@ public class SimulationRun implements Runnable{
 					timer.schedule(new TimerTask(){
 						@Override
 						public void run() {
-							remote.stop();
-							this.cancel();
-						} }, request.getRuntime()); 
+							Random rand=new Random();
+							int x=request.getxCoordinate();
+							int y=request.getyCoordinate();
+							int move_X=rand.nextInt(3)+1;
+							int move_Y=rand.nextInt(3)+1;
+							request.setxCoordinate(x+move_X);
+							request.setyCoordinate(y+move_Y);
+							remote.move(request.getxCoordinate(), request.getyCoordinate());
+							
+						} },0, 6000); //moving every 6seconds
+					
+					
 				}
 				
-			} }, 0, 5000);
-		
+			} }, 0, 5000);  //generating a request every 5seconds
+		*/
 		
 	}
+	
+	private void start(Remote remote, Request request){
+		/*Timer timer=new Timer();
+		timer.schedule(new TimerTask(){
+			@Override
+			public void run() {
+				remote.stop();
+				this.cancel();
+			} }, request.getRuntime()); 
+		
+		Timer timer2=new Timer();
+		timer.schedule(new TimerTask(){
+			@Override
+			public void run() {
+				Random rand=new Random();
+				int x=rand.nextInt(x_max);
+				int y=rand.nextInt(y_max);
+				remote=remote.move(x, y);
+			} },0, request.getRuntime()/3);
+			*/
+	}
+	
+	private void shutDown(Remote remote, Request request){
+		Timer timer=new Timer();
+		timer.schedule(new TimerTask(){
+			@Override
+			public void run() {
+				remote.stop();
+				this.cancel();
+			} }, request.getRuntime()); 
+	}
+	
 	
 	/*
 	 * TODO: Simulate Failures

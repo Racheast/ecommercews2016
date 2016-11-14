@@ -1,6 +1,9 @@
 package Interfaces;
 
+import impl.Address;
+import impl.RemoteClient;
+
 public interface RemoteController {
-	public boolean stop(int Edge_ID,int PM_ID, int VM_ID);
-	public Remote move(int Edge_ID,int PM_ID, int VM_ID,int x, int y);
+	public boolean stop(Address currentAddress);
+	public Address move(Address currentAddress,int x, int y);
 }

@@ -1,3 +1,4 @@
+package impl;
 import Interfaces.LocationElement;
 import Interfaces.SpecificationElement;
 
@@ -80,12 +81,16 @@ public class Request implements LocationElement, SpecificationElement{
 	public int getID(){
 		return this.ID;
 	}
-
+	
+	@Override
+	public Request getRequest() {
+		return this;
+	}
+	
 	@Override
 	public String toString() {
 		return "Request [ID=" + ID + ", memory=" + memory + ", cpu=" + cpu + ", bandwidth=" + bandwidth + ", size="
 				+ size + ", runtime=" + runtime + ", xCoordinate=" + xCoordinate + ", yCoordinate=" + yCoordinate + "]";
 	}
-	
-	
+		
 }
