@@ -103,6 +103,7 @@ public class SimulationRun implements Runnable{
 		EdgeController controller=initEdgeController();
 		System.out.println(controller.printMap()+"\n");
 		
+		/*
 		VM vm=generateVM();
 		System.out.println("SIMULATOR: Request generated: "+vm+"\n");
 		
@@ -113,68 +114,73 @@ public class SimulationRun implements Runnable{
 			timer.schedule(new TimerTask(){
 				@Override
 				public void run() {
-					Random rand=new Random();
-					int x=vm.getRequest().getxCoordinate();
-					int y=vm.getRequest().getyCoordinate();
-					int move_X=(int) Math.round(rand.nextGaussian() * 5);
-					int move_Y=(int) Math.round(rand.nextGaussian() * 5);
-					int new_x=x+move_X;
-					int new_y=y+move_Y;
+					int old_x=vm.getRequest().getxCoordinate();
+					int old_y=vm.getRequest().getyCoordinate();
+					vm.getRequest().setxCoordinate(moveX(vm.getRequest().getxCoordinate(),x_max));
+					vm.getRequest().setyCoordinate(moveY(vm.getRequest().getyCoordinate(),y_max));
 					
-					if(new_x >= x_max){
-						new_x=x_max-1;
-					}else if(new_x < 0){
-						new_x=0;
-					}
-					
-					if(new_y >= y_max){
-						new_y=y_max-1;
-					}else if(new_y < 0){
-						new_y=0;
-					}
-					
-					vm.getRequest().setxCoordinate(new_x);
-					vm.getRequest().setyCoordinate(new_y);
-					
-					System.out.println("SIMULATOR: Moving "+vm.getRequest().compactString()+" from ("+x+"/"+y+") to ("+vm.getRequest().getxCoordinate()+"/"+vm.getRequest().getyCoordinate()+")\n");
+					System.out.println("SIMULATOR: Moving "+vm.getRequest().compactString()+" from ("+old_x+"/"+old_y+") to ("+vm.getRequest().getxCoordinate()+"/"+vm.getRequest().getyCoordinate()+")\n");
 					remote.move(vm.getRequest().getxCoordinate(), vm.getRequest().getyCoordinate());
 					
 				} },0, 1000); //moving every 6seconds
 		}
+		*/
 		
-		
-		/*
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask(){
 			@Override
 			public void run() {
-				Request request=generateRequest();
-				System.out.println("\nSIMULATOR: Request generated: "+request);
-				Remote remote=controller.sendRequest(request);
+				
+				VM vm=generateVM();
+				System.out.println("SIMULATOR: Request generated: "+vm+"\n");
+				
+				Remote remote=controller.sendRequest(vm);
 				
 				if(remote!=null){
 					Timer timer=new Timer();
 					timer.schedule(new TimerTask(){
 						@Override
 						public void run() {
-							Random rand=new Random();
-							int x=request.getxCoordinate();
-							int y=request.getyCoordinate();
-							int move_X=rand.nextInt(3)+1;
-							int move_Y=rand.nextInt(3)+1;
-							request.setxCoordinate(x+move_X);
-							request.setyCoordinate(y+move_Y);
-							remote.move(request.getxCoordinate(), request.getyCoordinate());
-							
+							int old_x=vm.getRequest().getxCoordinate();
+							int old_y=vm.getRequest().getyCoordinate();
+							vm.getRequest().setxCoordinate(moveX(vm.getRequest().getxCoordinate(),x_max));
+							vm.getRequest().setyCoordinate(moveY(vm.getRequest().getyCoordinate(),y_max));
+					
+							System.out.println("SIMULATOR: Moving "+vm.getRequest().compactString()+" from ("+old_x+"/"+old_y+") to ("+vm.getRequest().getxCoordinate()+"/"+vm.getRequest().getyCoordinate()+")\n");
+							remote.move(vm.getRequest().getxCoordinate(), vm.getRequest().getyCoordinate());
 						} },0, 6000); //moving every 6seconds
-					
-					
 				}
 				
 			} }, 0, 5000);  //generating a request every 5seconds
-		*/
-		
 	}
+	
+	private int moveX(int x, int maximal_x){
+		Random rand=new Random();
+		int move_x=(int) Math.round(rand.nextGaussian() * 5);
+		int new_x=x+move_x;
+		
+		if(new_x >= maximal_x){
+			new_x=maximal_x-1;
+		}else if(new_x < 0){
+			new_x=0;
+		}	
+		return new_x;
+	}
+	
+	private int moveY(int y, int maximal_y){
+		Random rand=new Random();
+		int move_y=(int) Math.round(rand.nextGaussian() * 5);
+		int new_y=y+move_y;
+		
+		if(new_y >= maximal_y){
+			new_y=maximal_y-1;
+		}else if(new_y < 0){
+			new_y=0;
+		}	
+		return new_y;
+	}
+	
+	
 	
 	private void start(Remote remote, Request request){
 		/*Timer timer=new Timer();

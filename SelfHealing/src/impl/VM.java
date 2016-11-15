@@ -95,7 +95,7 @@ public class VM {
 	}
 	
 	public String compactString(){
-		return "VM"+ID;
+		return "VM"+ID+"("+request.compactString()+")";
 	}
 
 	

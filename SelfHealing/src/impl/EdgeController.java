@@ -47,7 +47,7 @@ public class EdgeController implements RemoteController{
 		ArrayList<Edge> sortedEdges=this.generateSortedDistanceList(this.getListOfEdges(), vm.getRequest());
 		
 		for(Edge e:sortedEdges){
-			System.out.println("CONTROLLER: SEND REQUEST OPERATION: Request"+vm.getRequest().getID()+" forwarded to edge"+e.getID()+"\n");
+			System.out.println("CONTROLLER: SEND REQUEST OPERATION: "+vm.compactString()+" forwarded to edge"+e.getID()+"\n");
 			VM newVM=e.assignRequest(vm);
 			
 			if(newVM!=null){
@@ -156,15 +156,15 @@ public class EdgeController implements RemoteController{
 			if(pm!=null){
 				if(vm!=null){
 					//System.out.println("CONTROLLER: Moving VM"+vm.getID()+" of Request"+vm.getRequest().getID()+" from ("+vm.getRequest().getxCoordinate()+"/"+vm.getRequest().getyCoordinate()+") to ("+x+"/"+y+")");
-					System.out.println("CONTROLLER: Moving VM"+vm.getID()+" of Request"+vm.getRequest().getID()+"\n");
+					System.out.println("CONTROLLER: Moving VM"+vm.getID()+"\n");
 					
 					ArrayList<Edge> sortedEdges=generateSortedDistanceList(this.getListOfEdges(), x, y);
 					
 					for(Edge e:sortedEdges){
-						System.out.println("CONTROLLER: MOVE OPERATION: VM"+vm.getID()+" forwarded to edge"+e.getID()+"\n");
+						System.out.println("CONTROLLER: MOVE OPERATION: "+vm.compactString()+" forwarded to edge"+e.getID()+"\n");
 						VM newVM=e.assignRequest(vm);
 						if(newVM!=null){
-							System.out.println("CONTROLLER: MOVE OPERATION: VM moved from "+vm.getAddress().compactString()+" to "+newVM.getAddress().compactString()+"\n");
+							System.out.println("CONTROLLER: MOVE OPERATION:"+ vm.compactString() +" moved from "+vm.getAddress().compactString()+" to "+newVM.getAddress().compactString()+"\n");
 							stop(vm);
 							return newVM;
 						}

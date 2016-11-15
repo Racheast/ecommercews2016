@@ -58,7 +58,7 @@ public class Edge implements LocationElement{
 				if((pm.getCpu() - pm.getConsumed_cpu()) >= vm.getCpu() && (pm.getMemory()-pm.getConsumed_memory()) >= vm.getMemory() && (pm.getConsumed_networkBandwith()==0 || (pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= vm.getNetworkBandwidth())){
 					pm.setNetwork_bandwidth(vm.getNetworkBandwidth());
 				
-					System.out.println(this.compactString()+": Assigning "+vm.compactString()+" of "+vm.getRequest().compactString() + " to "+pm.compactString()+"\n");
+					System.out.println(this.compactString()+": Assigning "+vm.compactString()+" to "+pm.compactString()+"\n");
 					VM newVM=pm.startApplication(vm);
 					newVM.getAddress().setEdge_ID(this.ID);
 					return newVM;

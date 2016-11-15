@@ -38,7 +38,7 @@ public class Address {
 	}
 
 	public String compactString(){
-		return Edge_ID+"/"+PM_ID;
+		return "Edge"+Edge_ID+"/PM"+PM_ID;
 	}
 	
 	
