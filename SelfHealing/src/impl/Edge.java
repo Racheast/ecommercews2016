@@ -47,10 +47,18 @@ public class Edge implements LocationElement{
 		ArrayList<PM> pmList=getListOfPMs();
 		
 		for(PM pm:pmList){
-			if(pm.getVms().containsKey(vm.getID()))
+			if(pm.getVms().containsKey(vm.getID())){
 				return vm;
+			}
 		}
-		
+		/*
+		for(PM pm:pmList){
+			if(pm.getVms().containsKey(vm.getID())){
+				System.out.println("if(pm.getVms().containsKey(vm.getID())) == TRUE");
+				return vm;
+			}
+		}
+		*/
 		int bandwidthSum=getConsumedBandwidth();
 		
 		if((this.bandwidth - bandwidthSum) >= vm.getNetworkBandwidth()){

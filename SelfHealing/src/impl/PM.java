@@ -33,8 +33,8 @@ public class PM{
 		Address address=new Address();
 		newVM.setAddress(address);
 		newVM.getAddress().setPM_ID(this.ID);
-		vms.put(vm.getID(),newVM);
-		System.out.println(this.compactString()+": "+newVM.compactString()+" for "+vm.compactString()+" of "+vm.getRequest().compactString()+" created!\n");		
+		vms.put(newVM.getID(),newVM);
+		System.out.println(this.compactString()+": "+newVM.compactString()+" for "+vm.compactString()+" created!\n");		
 		return newVM;
 	}
 	

@@ -137,26 +137,38 @@ public class SimulationRun implements Runnable{
 				Remote remote=controller.sendRequest(vm);
 				
 				if(remote!=null){
-					Timer timer=new Timer();
-					timer.schedule(new TimerTask(){
+					long start=System.currentTimeMillis();
+					long end=System.currentTimeMillis()+vm.getRuntime();
+					
+					Timer timer2=new Timer();
+					timer2.schedule(new TimerTask(){
+						
+						
 						@Override
 						public void run() {
-							int old_x=vm.getRequest().getxCoordinate();
-							int old_y=vm.getRequest().getyCoordinate();
-							vm.getRequest().setxCoordinate(moveX(vm.getRequest().getxCoordinate(),x_max));
-							vm.getRequest().setyCoordinate(moveY(vm.getRequest().getyCoordinate(),y_max));
-					
-							System.out.println("SIMULATOR: Moving "+vm.getRequest().compactString()+" from ("+old_x+"/"+old_y+") to ("+vm.getRequest().getxCoordinate()+"/"+vm.getRequest().getyCoordinate()+")\n");
-							remote.move(vm.getRequest().getxCoordinate(), vm.getRequest().getyCoordinate());
-						} },0, 6000); //moving every 6seconds
+							if(System.currentTimeMillis() < end){	
+								int old_x=vm.getRequest().getxCoordinate();
+								int old_y=vm.getRequest().getyCoordinate();
+								vm.getRequest().setxCoordinate(moveX(vm.getRequest().getxCoordinate(),x_max));
+								vm.getRequest().setyCoordinate(moveY(vm.getRequest().getyCoordinate(),y_max));
+						
+								System.out.println("SIMULATOR: Moving "+vm.getRequest().compactString()+" from ("+old_x+"/"+old_y+") to ("+vm.getRequest().getxCoordinate()+"/"+vm.getRequest().getyCoordinate()+")\n");
+								remote.move(vm.getRequest().getxCoordinate(), vm.getRequest().getyCoordinate());
+							}else{
+								System.out.println("SIMULATOR: Cancelling "+vm.getRequest().compactString()+"\n");
+								remote.stop();
+								this.cancel();
+							}
+						} },2000, 1000); //moving requests (=users) across the map
 				}
 				
-			} }, 0, 5000);  //generating a request every 5seconds
+			} }, 0, 10000);  //generating new requests
 	}
 	
 	private int moveX(int x, int maximal_x){
 		Random rand=new Random();
-		int move_x=(int) Math.round(rand.nextGaussian() * 5);
+		//int move_x=(int) Math.round(rand.nextGaussian() * 5);
+		int move_x=rand.nextInt(3)-1;  //move_x out of [-1,0,+1]
 		int new_x=x+move_x;
 		
 		if(new_x >= maximal_x){
@@ -169,7 +181,8 @@ public class SimulationRun implements Runnable{
 	
 	private int moveY(int y, int maximal_y){
 		Random rand=new Random();
-		int move_y=(int) Math.round(rand.nextGaussian() * 5);
+		//int move_y=(int) Math.round(rand.nextGaussian() * 5);
+		int move_y=rand.nextInt(3)-1;  //move_y out of [-1,0,+1]
 		int new_y=y+move_y;
 		
 		if(new_y >= maximal_y){
@@ -183,7 +196,8 @@ public class SimulationRun implements Runnable{
 	
 	
 	private void start(Remote remote, Request request){
-		/*Timer timer=new Timer();
+		/*^
+		Timer timer=new Timer();
 		timer.schedule(new TimerTask(){
 			@Override
 			public void run() {

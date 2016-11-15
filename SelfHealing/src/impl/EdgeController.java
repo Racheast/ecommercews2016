@@ -96,8 +96,8 @@ public class EdgeController implements RemoteController{
 	
 	public String printMap(){
 		String output="";
-		for(int x=0; x<map.length; x++){
-			for(int y=0; y<map[0].length; y++){
+		for(int y=0; y<map[0].length; y++){
+			for(int x=0; x<map.length; x++){
 				if(map[x][y]!=null){
 					output+="X";
 				}else{
@@ -154,22 +154,26 @@ public class EdgeController implements RemoteController{
 		if(edge!=null){
 			PM pm=edge.getPms().get(vm.getAddress().getPM_ID());
 			if(pm!=null){
-				if(vm!=null){
+				
 					//System.out.println("CONTROLLER: Moving VM"+vm.getID()+" of Request"+vm.getRequest().getID()+" from ("+vm.getRequest().getxCoordinate()+"/"+vm.getRequest().getyCoordinate()+") to ("+x+"/"+y+")");
-					System.out.println("CONTROLLER: Moving VM"+vm.getID()+"\n");
+					System.out.println("CONTROLLER: Moving "+vm.compactString()+"\n");
 					
 					ArrayList<Edge> sortedEdges=generateSortedDistanceList(this.getListOfEdges(), x, y);
 					
 					for(Edge e:sortedEdges){
-						System.out.println("CONTROLLER: MOVE OPERATION: "+vm.compactString()+" forwarded to edge"+e.getID()+"\n");
+						System.out.println("CONTROLLER: MOVE OPERATION: "+vm.compactString()+" forwarded to "+e.compactString()+"\n");
 						VM newVM=e.assignRequest(vm);
 						if(newVM!=null){
-							System.out.println("CONTROLLER: MOVE OPERATION:"+ vm.compactString() +" moved from "+vm.getAddress().compactString()+" to "+newVM.getAddress().compactString()+"\n");
-							stop(vm);
+							if(vm!=newVM){
+								System.out.println("CONTROLLER: MOVE OPERATION:"+ vm.compactString() +" copied from "+vm.getAddress().compactString()+" to "+newVM.getAddress().compactString()+"\n");
+								stop(vm);
+							}else{
+								System.out.println("CONTROLLER: MOVE OPERATION: "+ vm.compactString() +" remained on "+vm.getAddress().compactString()+"\n");
+							}
 							return newVM;
 						}
 					}
-				}
+				
 			}
 		}
 		System.out.println("MOVE OPERATION: No proper edges found! VM stayed on "+vm.getAddress().compactString()+"\n");
