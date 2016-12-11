@@ -13,11 +13,12 @@ public class EdgeController implements RemoteController{
 	private HashMap<Integer, Edge> edges;
 	private Edge[][] map;
 	
+	//constructor we don't use at the moment
 	public EdgeController(){
 		map=new Edge[100][100];
 		edges=new HashMap<Integer,Edge>();
 	}
-	
+		
 	public EdgeController(int x_max, int y_max){
 		map=new Edge[x_max][y_max];
 		edges=new HashMap<Integer,Edge>();
@@ -36,6 +37,7 @@ public class EdgeController implements RemoteController{
 		this.map[x][y]=edge;
 	}
 	
+	// FIFO realization for handling requests
 	public synchronized RemoteClient sendRequest(VM vm){
 		//TODO: allocate application to proper edge
 		
@@ -59,6 +61,7 @@ public class EdgeController implements RemoteController{
 		}
 		
 		System.out.println("CONTROLLER: SEND REQUEST OPERATION: No proper edges found!\n");
+		//add the counter of mistakes
 		return null;
 	}
 	
@@ -82,6 +85,7 @@ public class EdgeController implements RemoteController{
 		}
 		
 		return sortedEdges;
+		//sorted edges
 	}
 	
 	private int manhattanDistance(int x1, int y1, int x2, int y2){
@@ -93,6 +97,9 @@ public class EdgeController implements RemoteController{
 			return -1;
 		return manhattanDistance(e1.getxCoordinate(),e1.getyCoordinate(),e2.getxCoordinate(),e2.getyCoordinate());
 	}
+	
+	
+//we have different grids every time
 	
 	public String printMap(){
 		String output="";
