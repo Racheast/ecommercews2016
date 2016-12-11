@@ -27,8 +27,20 @@ public class PM{
 		this.memory = memory;
 		this.size = size;
 	}
-
-	public VM startApplication(VM vm){
+	
+	public VM copyVM(VM vm, double r){
+		int v=vm.getMemory();
+		double t=v/r;
+		
+		while(v > vm.getPage_dirtying_threshold()){
+			v = (int) Math.round(vm.getPage_dirtying_rate() * t);
+			t = v/r;
+		}
+		
+		return startApplication(vm);
+	}
+	
+	public synchronized VM startApplication(VM vm){
 		VM newVM=new VM(vm);
 		Address address=new Address();
 		newVM.setAddress(address);

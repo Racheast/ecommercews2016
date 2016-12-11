@@ -39,8 +39,35 @@ public class Edge implements LocationElement{
 	public int getyCoordinate() {
 		return yCoordinate;
 	}
-
+	
 	public synchronized VM assignRequest(VM vm){
+		ArrayList<PM> pmList=getListOfPMs();
+		
+		for(PM pm:pmList){
+			if(pm.getVms().containsKey(vm.getID())){
+				return vm;
+			}
+		}
+		
+		int bandwidthSum=getConsumedBandwidth();
+		
+		if((this.bandwidth - bandwidthSum) >= vm.getNetworkBandwidth()){
+			for(PM pm:pmList){
+				if((pm.getCpu() - pm.getConsumed_cpu()) >= vm.getCpu() && (pm.getMemory()-pm.getConsumed_memory()) >= vm.getMemory() && (pm.getConsumed_networkBandwith()==0 || (pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= vm.getNetworkBandwidth())){
+					pm.setNetwork_bandwidth(vm.getNetworkBandwidth());
+				
+					System.out.println(this.compactString()+": Assigning "+vm.compactString()+" to "+pm.compactString()+"\n");
+					VM newVM=pm.startApplication(vm);
+					newVM.getAddress().setEdge_ID(this.ID);
+					return newVM;
+				}
+			}
+		}
+		System.out.println("EDGE"+this.ID+": No available PM found!\n");
+		return null;
+	}
+	
+	public synchronized VM assignRequest(VM vm, double transmissionRate){
 		//1. assign application to proper pm
 		//2. allocate a certain amount of available bandwidth to the pm
 		
@@ -67,7 +94,7 @@ public class Edge implements LocationElement{
 					pm.setNetwork_bandwidth(vm.getNetworkBandwidth());
 				
 					System.out.println(this.compactString()+": Assigning "+vm.compactString()+" to "+pm.compactString()+"\n");
-					VM newVM=pm.startApplication(vm);
+					VM newVM=pm.copyVM(vm, transmissionRate);
 					newVM.getAddress().setEdge_ID(this.ID);
 					return newVM;
 				}

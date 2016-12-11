@@ -18,7 +18,8 @@ public class VM {
 	private int consumed_networkBandwith;  //depends on the consumed memory
 	private int runtime;
 	private double page_dirtying_rate;  //depends linearly on the combination of the utilized memory, cpu and nw_bandwidth
-
+	private final double page_dirtying_threshold;
+	
 	public VM(VM vm){
 		this.ID=id_counter++;
 		this.request=vm.getRequest();
@@ -28,6 +29,7 @@ public class VM {
 		this.consumed_networkBandwith=vm.getNetworkBandwidth();
 		this.runtime=vm.getRuntime();
 		this.page_dirtying_rate=2.0;
+		this.page_dirtying_threshold=0.05;
 	}
 	
 	public VM(Request request, int size, int consumed_cpu, int consumed_memory, int consumed_networkBandwith,
@@ -40,6 +42,7 @@ public class VM {
 		this.consumed_networkBandwith = consumed_networkBandwith;
 		this.runtime = runtime;
 		this.page_dirtying_rate=2.0;
+		this.page_dirtying_threshold=0.05;
 	}
 	
 	public int getRuntime() {
@@ -86,17 +89,28 @@ public class VM {
 	public void setAddress(Address address) {
 		this.address = address;
 	}
-
-	@Override
-	public String toString() {
-		return "VM [ID=" + ID + ", request=" + request + ", size=" + size + ", consumed_cpu=" + consumed_cpu
-				+ ", consumed_memory=" + consumed_memory + ", consumed_networkBandwith=" + consumed_networkBandwith
-				+ ", runtime=" + runtime + ", page_dirtying_rate=" + page_dirtying_rate + "]";
-	}
 	
+	public double getPage_dirtying_rate() {
+		return page_dirtying_rate;
+	}
+
+	public double getPage_dirtying_threshold() {
+		return page_dirtying_threshold;
+	}
+
 	public String compactString(){
 		return "VM"+ID+"("+request.compactString()+")";
 	}
+
+	@Override
+	public String toString() {
+		return "VM [ID=" + ID + ", request=" + request + ", address=" + address + ", size=" + size + ", consumed_cpu="
+				+ consumed_cpu + ", consumed_memory=" + consumed_memory + ", consumed_networkBandwith="
+				+ consumed_networkBandwith + ", runtime=" + runtime + ", page_dirtying_rate=" + page_dirtying_rate
+				+ ", page_dirtying_threshold=" + page_dirtying_threshold + "]";
+	}
+	
+	
 
 	
 }

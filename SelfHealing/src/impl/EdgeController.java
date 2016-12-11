@@ -130,7 +130,7 @@ public class EdgeController implements RemoteController{
 		if(distance==max_distance)
 			distance--;  //avoid that r==0
 		
-		double r=(1- distance/max_distance)*sourceEdge.getBandwidth();
+		double r=(1- (distance/max_distance))*sourceEdge.getBandwidth();
 			
 		return r;
 	}
@@ -150,9 +150,9 @@ public class EdgeController implements RemoteController{
 
 	@Override
 	public synchronized VM move(VM vm, int x, int y) {
-		Edge edge=edges.get(vm.getAddress().getEdge_ID());
-		if(edge!=null){
-			PM pm=edge.getPms().get(vm.getAddress().getPM_ID());
+		Edge sourceEdge=edges.get(vm.getAddress().getEdge_ID());
+		if(sourceEdge!=null){
+			PM pm=sourceEdge.getPms().get(vm.getAddress().getPM_ID());
 			if(pm!=null){
 				
 					//System.out.println("CONTROLLER: Moving VM"+vm.getID()+" of Request"+vm.getRequest().getID()+" from ("+vm.getRequest().getxCoordinate()+"/"+vm.getRequest().getyCoordinate()+") to ("+x+"/"+y+")");
@@ -160,9 +160,10 @@ public class EdgeController implements RemoteController{
 					
 					ArrayList<Edge> sortedEdges=generateSortedDistanceList(this.getListOfEdges(), x, y);
 					
-					for(Edge e:sortedEdges){
-						System.out.println("CONTROLLER: MOVE OPERATION: "+vm.compactString()+" forwarded to "+e.compactString()+"\n");
-						VM newVM=e.assignRequest(vm);
+					for(Edge targetEdge:sortedEdges){
+						System.out.println("CONTROLLER: MOVE OPERATION: "+vm.compactString()+" forwarded to "+targetEdge.compactString()+"\n");
+						VM newVM=targetEdge.assignRequest(vm, getMemoryTransmissionRate(sourceEdge, targetEdge));
+						
 						if(newVM!=null){
 							if(vm!=newVM){
 								System.out.println("CONTROLLER: MOVE OPERATION:"+ vm.compactString() +" copied from "+vm.getAddress().compactString()+" to "+newVM.getAddress().compactString()+"\n");
@@ -176,7 +177,7 @@ public class EdgeController implements RemoteController{
 				
 			}
 		}
-		System.out.println("MOVE OPERATION: No proper edges found! VM stayed on "+vm.getAddress().compactString()+"\n");
+		System.out.println("CONTROLLER: MOVE OPERATION: No proper edges found! VM stayed on "+vm.getAddress().compactString()+"\n");
 		return vm;  //Return the old vm if new edge could not be found
 	}
 

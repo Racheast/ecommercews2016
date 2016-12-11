@@ -61,6 +61,7 @@ public class SimulationRun implements Runnable{
 	private static HashMap<Integer,PM> generatePMs(int amount){
 		HashMap<Integer,PM> pms=new HashMap<Integer,PM>();
 		for(int i=0; i<amount; i++){
+			//generate random speccs
 			Random rand=new Random();
 			int cpu=(int) Math.round(rand.nextGaussian() * 15 + 1000000);
 			int memory=(int) Math.round(rand.nextGaussian() * 15 + 5000000);
