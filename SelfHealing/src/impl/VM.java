@@ -17,7 +17,7 @@ public class VM {
 	private int consumed_memory;
 	private int consumed_networkBandwith;  //depends on the consumed memory
 	private int runtime;
-	private double page_dirtying_rate;  //depends linearly on the combination of the utilized memory, cpu and nw_bandwidth
+	private double page_dirtying_rate;  //TODO: depends linearly on the combination of the utilized memory, cpu and nw_bandwidth
 	private final double page_dirtying_threshold;
 	
 	public VM(VM vm){

@@ -1,4 +1,6 @@
-package impl;
+package Comparables;
+
+import impl.Edge;
 
 public class ComparableEdge implements Comparable<ComparableEdge> {
 	private final Edge edge;

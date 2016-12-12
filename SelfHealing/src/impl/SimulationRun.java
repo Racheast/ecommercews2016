@@ -41,8 +41,8 @@ public class SimulationRun implements Runnable {
 				if (randNr == 1) {
 					Edge edge = new Edge(x, y, u0, bandwidth);
 					System.out.println(edge);
-					randNr = 1 + rand.nextInt(10);
-					edge.setPms(generatePMs(randNr)); // max 10 PMs per edge !!
+					randNr = rand.nextInt(10) + 1;
+					edge.installPms(generatePMs(randNr)); // max 10 PMs per edge !!
 					controller.addEdge(x, y, edge);
 				}
 			}
@@ -64,9 +64,9 @@ public class SimulationRun implements Runnable {
 			int size = (int) Math.round(rand.nextGaussian() * 2 + 5);
 
 			double u0 = rand.nextGaussian() * 10 + 100;
-			double u_cpu = rand.nextGaussian() * 12 + 200;
-			double u_mem = rand.nextGaussian() * 11 + 400;
-			double u_network = rand.nextGaussian() * 10 + 100;
+			double u_cpu = rand.nextGaussian() * 40 + 200;
+			double u_mem = rand.nextGaussian() * 20 + 400;
+			double u_network = rand.nextGaussian() * 30 + 100;
 
 			PM pm = new PM(u0, u_cpu, u_mem, u_network, cpu, memory, size);
 

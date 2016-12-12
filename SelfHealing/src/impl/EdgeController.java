@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import Comparables.ComparableEdge;
 import Interfaces.LocationElement;
 import Interfaces.Remote;
 import Interfaces.RemoteController;
@@ -40,14 +41,6 @@ public class EdgeController implements RemoteController {
 
 	// FIFO realization for handling requests
 	public synchronized RemoteClient sendRequest(VM vm) {
-		// TODO: allocate application to proper edge
-
-		/*
-		 * 1. generate sorted Edge list considering the distance between each
-		 * edge-location and the request-location 2. run through sorted Edge
-		 * list and check whether this edge has free specs 3. assign request to
-		 * the nearest free edge and return true or return false
-		 */
 		ArrayList<Edge> sortedEdges = this.generateSortedDistanceList(this.getListOfEdges(), vm.getRequest());
 
 		for (Edge e : sortedEdges) {
@@ -171,8 +164,8 @@ public class EdgeController implements RemoteController {
 
 			if (pm != null) {
 				if (pm.getID() != vm.getAddress().getPM_ID()) {
-					int v_mig = migrate(vm, pm, getMemoryTransmissionRate(sourceEdge, targetEdge));
-					// TODO: Calculate u_mig
+					double v_mig = migrateVM(vm, pm, getMemoryTransmissionRate(sourceEdge, targetEdge));
+					double u_mig = 0.9 * v_mig  +0.1; //u_mig = alpha * v_mig + beta
 					VM newVM = pm.startApplication(vm);
 					newVM.getAddress().setEdge_ID(targetEdge.getID());
 					System.out.println("CONTROLLER: MOVE OPERATION:" + vm.compactString() + " copied from "
@@ -196,12 +189,12 @@ public class EdgeController implements RemoteController {
 	 * Iterratively "transmits" vm to pm Returns the total amount of datavolume
 	 * that was transmitted during the migration process
 	 */
-	private int migrate(VM vm, PM pm, double transmissionRate) {
-		int dataVolume = vm.getMemory();
-		int totalDataVolume = dataVolume;
-		while (dataVolume > (int) Math.round(vm.getMemory() * vm.getPage_dirtying_threshold())) {
-			double t = pm.copyVM(dataVolume, transmissionRate);
-			dataVolume = (int) Math.round(vm.getPage_dirtying_rate() * t);
+	private double migrateVM(VM vm, PM pm, double transmissionRate) {
+		double dataVolume = vm.getMemory();
+		double totalDataVolume = dataVolume;
+		while (dataVolume > vm.getMemory() * vm.getPage_dirtying_threshold()) {
+			double t = pm.migrateVM(dataVolume, transmissionRate);
+			dataVolume = vm.getPage_dirtying_rate() * t;
 			totalDataVolume += dataVolume;
 		}
 		return totalDataVolume;
