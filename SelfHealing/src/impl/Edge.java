@@ -41,32 +41,48 @@ public class Edge implements LocationElement{
 	}
 	
 	public synchronized VM assignRequest(VM vm){
-		ArrayList<PM> pmList=getListOfPMs();
-		
-		for(PM pm:pmList){
-			if(pm.getVms().containsKey(vm.getID())){
-				return vm;
-			}
+		PM pm=findPMforVM(vm);
+		if(pm!=null){
+			pm.addNetwork_bandwidth(vm.getNetworkBandwidth());
+			System.out.println(this.compactString()+": Assigning "+vm.compactString()+" to "+pm.compactString()+"\n");
+			VM newVM=pm.startApplication(vm);
+			newVM.getAddress().setEdge_ID(this.ID);
+			return newVM;
 		}
 		
-		int bandwidthSum=getConsumedBandwidth();
-		
-		if((this.bandwidth - bandwidthSum) >= vm.getNetworkBandwidth()){
-			for(PM pm:pmList){
-				if((pm.getCpu() - pm.getConsumed_cpu()) >= vm.getCpu() && (pm.getMemory()-pm.getConsumed_memory()) >= vm.getMemory() && (pm.getConsumed_networkBandwith()==0 || (pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= vm.getNetworkBandwidth())){
-					pm.setNetwork_bandwidth(vm.getNetworkBandwidth());
-				
-					System.out.println(this.compactString()+": Assigning "+vm.compactString()+" to "+pm.compactString()+"\n");
-					VM newVM=pm.startApplication(vm);
-					newVM.getAddress().setEdge_ID(this.ID);
-					return newVM;
-				}
-			}
-		}
 		System.out.println("EDGE"+this.ID+": No available PM found!\n");
 		return null;
 	}
 	
+	/*
+	 * Searches for a PM that has enough free specs to handle the vm.
+	 * If vm is already located in this edge then the hosting pm is returned.
+	 * otherwise a pm with enough free specs is returned.
+	 * If no pm available then null is returned.
+	 */
+	public synchronized PM findPMforVM(VM vm){
+		ArrayList<PM> pmList=getListOfPMs();
+		
+		//Check if vm is already located in this edge. If yes return pm that contains vm
+		for(PM pm:pmList){
+			if(pm.getVms().containsKey(vm.getID())){
+				return pm;
+			}
+		}
+		
+		//Check if this edge has enough free Bandwidth for vm
+		if((this.bandwidth - this.getConsumedBandwidth()) >= vm.getNetworkBandwidth()){
+			for(PM pm:pmList){
+				if((pm.getCpu() - pm.getConsumed_cpu()) >= vm.getCpu() && (pm.getMemory()-pm.getConsumed_memory()) >= vm.getMemory() ){
+					return pm;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	/*
 	public synchronized VM assignRequest(VM vm, double transmissionRate){
 		//1. assign application to proper pm
 		//2. allocate a certain amount of available bandwidth to the pm
@@ -78,20 +94,20 @@ public class Edge implements LocationElement{
 				return vm;
 			}
 		}
-		/*
+		
 		for(PM pm:pmList){
 			if(pm.getVms().containsKey(vm.getID())){
 				System.out.println("if(pm.getVms().containsKey(vm.getID())) == TRUE");
 				return vm;
 			}
 		}
-		*/
+		
 		int bandwidthSum=getConsumedBandwidth();
 		
 		if((this.bandwidth - bandwidthSum) >= vm.getNetworkBandwidth()){
 			for(PM pm:pmList){
-				if((pm.getCpu() - pm.getConsumed_cpu()) >= vm.getCpu() && (pm.getMemory()-pm.getConsumed_memory()) >= vm.getMemory() && (pm.getConsumed_networkBandwith()==0 || (pm.getNetwork_bandwidth() - pm.getConsumed_networkBandwith()) >= vm.getNetworkBandwidth())){
-					pm.setNetwork_bandwidth(vm.getNetworkBandwidth());
+				if((pm.getCpu() - pm.getConsumed_cpu()) >= vm.getCpu() && (pm.getMemory()-pm.getConsumed_memory()) >= vm.getMemory() ){
+					pm.addNetwork_bandwidth(vm.getNetworkBandwidth());
 				
 					System.out.println(this.compactString()+": Assigning "+vm.compactString()+" to "+pm.compactString()+"\n");
 					VM newVM=pm.copyVM(vm, transmissionRate);
@@ -103,6 +119,7 @@ public class Edge implements LocationElement{
 		System.out.println("EDGE"+this.ID+": No available PM found!\n");
 		return null;
 	}
+	*/
 	
 	public synchronized void putPM(Integer key, PM pm){
 		pms.put(key, pm);

@@ -26,6 +26,7 @@ public class PM{
 		this.cpu = cpu;
 		this.memory = memory;
 		this.size = size;
+		this.network_bandwidth = 0;
 	}
 	
 	public VM copyVM(VM vm, double r){
@@ -38,6 +39,10 @@ public class PM{
 		}
 		
 		return startApplication(vm);
+	}
+	
+	public double copyVM(int dataVolume, double transmissionRate){
+		return dataVolume/transmissionRate;
 	}
 	
 	public synchronized VM startApplication(VM vm){
@@ -109,10 +114,15 @@ public class PM{
 	public void setNetwork_bandwidth(int network_bandwidth) {
 		this.network_bandwidth = network_bandwidth;
 	}
-
-	public boolean shutdownVM(int VM_ID){
-		this.vms.remove(VM_ID);
-		System.out.println(this.compactString()+": VM"+VM_ID+" shut down.\n");
+	
+	public void addNetwork_bandwidth(int network_bandwidth){
+		this.network_bandwidth += network_bandwidth;
+	}
+	
+	public boolean shutdownVM(int vmID){
+		this.network_bandwidth -= vms.get(vmID).getNetworkBandwidth();
+		this.vms.remove(vmID);
+		System.out.println(this.compactString()+": VM"+vmID+" shut down.\n");
 		return true;
 	}
 	

@@ -1,9 +1,7 @@
 package impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -15,18 +13,18 @@ public class SimulationRun implements Runnable {
 	private HashMap<Integer, SLA> slas;
 
 	public SimulationRun(int x_max, int y_max) {
-		
-		slas= new HashMap<Integer, SLA>();
-		SLA sla1 = new SLA(1,3,4,54,600,70,0.9995);
-		SLA sla2 = new SLA(2,4,8,108,600,90,0.9895);
-		SLA sla3 = new SLA(2,2,3,27,600,140,0.85);
+
+		slas = new HashMap<Integer, SLA>();
+		SLA sla1 = new SLA(1, 3, 4, 54, 600, 70, 0.9995);
+		SLA sla2 = new SLA(2, 4, 8, 108, 600, 90, 0.9895);
+		SLA sla3 = new SLA(2, 2, 3, 27, 600, 140, 0.85);
 		slas.put(1, sla1);
 		slas.put(2, sla2);
 		slas.put(3, sla3);
-		
+
 		this.x_max = x_max;
 		this.y_max = y_max;
-	
+
 	}
 
 	private EdgeController initEdgeController() {
@@ -49,15 +47,6 @@ public class SimulationRun implements Runnable {
 				}
 			}
 		}
-
-		/*
-		 * //generate random bandwiths for each pair of edges ArrayList<Edge>
-		 * edges=controller.getEdges(); for(Edge e1:edges){ for(Edge e2:edges){
-		 * if(e1!=e2){ Random rand=new Random(); int bandwith=(int)
-		 * Math.round(rand.nextGaussian() * 3 + 10000); e1.setBandwith(e2,
-		 * bandwith); } } }
-		 */
-
 		return controller;
 	}
 
@@ -65,21 +54,21 @@ public class SimulationRun implements Runnable {
 	 * automatically generates a certain amount of PMs (MAX 10 PMs !) for
 	 * simulation purposes
 	 */
-	private static HashMap<Integer,PM> generatePMs(int amount){
-		HashMap<Integer,PM> pms=new HashMap<Integer,PM>();
-		for(int i=0; i<amount; i++){
-			//generate random speccs
-			Random rand=new Random();
-			int cpu=(int) Math.round(rand.nextGaussian() * 15 + 1000000);
-			int memory=(int) Math.round(rand.nextGaussian() * 15 + 5000000);
-			int size=(int) Math.round(rand.nextGaussian() *2 +5);
-			
-			double u0=rand.nextGaussian()*10 + 100;
-			double u_cpu=rand.nextGaussian()*12 + 200;
-			double u_mem=rand.nextGaussian()*11 + 400;
-			double u_network=rand.nextGaussian()*10 + 100;
-			
-			PM pm=new PM(u0,u_cpu,u_mem,u_network,cpu,memory,size);
+	private static HashMap<Integer, PM> generatePMs(int amount) {
+		HashMap<Integer, PM> pms = new HashMap<Integer, PM>();
+		for (int i = 0; i < amount; i++) {
+			// generate random speccs
+			Random rand = new Random();
+			int cpu = (int) Math.round(rand.nextGaussian() * 15 + 1000000);
+			int memory = (int) Math.round(rand.nextGaussian() * 15 + 5000000);
+			int size = (int) Math.round(rand.nextGaussian() * 2 + 5);
+
+			double u0 = rand.nextGaussian() * 10 + 100;
+			double u_cpu = rand.nextGaussian() * 12 + 200;
+			double u_mem = rand.nextGaussian() * 11 + 400;
+			double u_network = rand.nextGaussian() * 10 + 100;
+
+			PM pm = new PM(u0, u_cpu, u_mem, u_network, cpu, memory, size);
 
 			System.out.println(pm);
 			pms.put(pm.getID(), pm);
@@ -94,7 +83,7 @@ public class SimulationRun implements Runnable {
 		int needed_bandwidth = Math.abs((int) Math.round(rand.nextGaussian() * 15 + 1500));
 		int needed_size = Math.abs((int) Math.round(rand.nextGaussian() * 1.75 + 1));
 		int runtime = Math.abs((int) Math.round(rand.nextGaussian() * 7000 + 10000)); // runtime
-		
+
 		return new VM(generateRequest(), needed_size, needed_cpu, needed_memory, needed_bandwidth, runtime);
 	}
 
@@ -103,11 +92,9 @@ public class SimulationRun implements Runnable {
 		int xCoordinate = rand.nextInt(x_max);
 		int yCoordinate = rand.nextInt(y_max);
 		int slaID = rand.nextInt(3) + 1; // we randomize SLA selection
-			
+
 		return new Request(xCoordinate, yCoordinate, slas.get(slaID));
 	}
-	
-	
 
 	@Override
 	public void run() {
@@ -115,32 +102,6 @@ public class SimulationRun implements Runnable {
 		System.out.println("SIMULATOR: Initializing map...");
 		EdgeController controller = initEdgeController();
 		System.out.println(controller.printMap() + "\n");
-
-		/*
-		 * VM vm=generateVM();
-		 * System.out.println("SIMULATOR: Request generated: "+vm+"\n");
-		 * 
-		 * Remote remote=controller.sendRequest(vm);
-		 * 
-		 * if(remote!=null){ Timer timer=new Timer(); timer.schedule(new
-		 * TimerTask(){
-		 * 
-		 * @Override public void run() { int
-		 * old_x=vm.getRequest().getxCoordinate(); int
-		 * old_y=vm.getRequest().getyCoordinate();
-		 * vm.getRequest().setxCoordinate(moveX(vm.getRequest().getxCoordinate()
-		 * ,x_max));
-		 * vm.getRequest().setyCoordinate(moveY(vm.getRequest().getyCoordinate()
-		 * ,y_max));
-		 * 
-		 * System.out.println("SIMULATOR: Moving "+vm.getRequest().compactString
-		 * ()+" from ("+old_x+"/"+old_y+") to ("+vm.getRequest().getxCoordinate(
-		 * )+"/"+vm.getRequest().getyCoordinate()+")\n");
-		 * remote.move(vm.getRequest().getxCoordinate(),
-		 * vm.getRequest().getyCoordinate());
-		 * 
-		 * } },0, 1000); //moving every 6seconds }
-		 */
 
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
@@ -157,7 +118,6 @@ public class SimulationRun implements Runnable {
 				Remote remote = controller.sendRequest(vm);
 
 				if (remote != null) {
-					long start = System.currentTimeMillis();
 					long end = System.currentTimeMillis() + vm.getRuntime();
 
 					Timer timer2 = new Timer();
@@ -169,8 +129,8 @@ public class SimulationRun implements Runnable {
 							if (System.currentTimeMillis() < end) {
 								int old_x = vm.getRequest().getxCoordinate();
 								int old_y = vm.getRequest().getyCoordinate();
-								vm.getRequest().setxCoordinate(moveX(vm.getRequest().getxCoordinate(), x_max));
-								vm.getRequest().setyCoordinate(moveY(vm.getRequest().getyCoordinate(), y_max));
+								vm.getRequest().setxCoordinate(randomStep(vm.getRequest().getxCoordinate(), x_max));
+								vm.getRequest().setyCoordinate(randomStep(vm.getRequest().getyCoordinate(), y_max));
 
 								System.out.println("SIMULATOR: Moving " + vm.getRequest().compactString() + " from ("
 										+ old_x + "/" + old_y + ") to (" + vm.getRequest().getxCoordinate() + "/"
@@ -189,58 +149,16 @@ public class SimulationRun implements Runnable {
 		}, 0, 10000); // generating new requests
 	}
 
-	private int moveX(int x, int maximal_x) {
+	private int randomStep(int c, int max_c) {
 		Random rand = new Random();
-		// int move_x=(int) Math.round(rand.nextGaussian() * 5);
-		int move_x = rand.nextInt(3) - 1; // move_x out of [-1,0,+1]
-		int new_x = x + move_x;
-
-		if (new_x >= maximal_x) {
-			new_x = maximal_x - 1;
-		} else if (new_x < 0) {
-			new_x = 0;
+		int step = rand.nextInt(3) - 1; // step out of [-1,0,+1]
+		int new_c = c + step;
+		if (new_c >= max_c) {
+			new_c = max_c - 1;
+		} else if (new_c < 0) {
+			new_c = 0;
 		}
-		return new_x;
+		return new_c;
 	}
 
-	private int moveY(int y, int maximal_y) {
-		Random rand = new Random();
-		// int move_y=(int) Math.round(rand.nextGaussian() * 5);
-		int move_y = rand.nextInt(3) - 1; // move_y out of [-1,0,+1]
-		int new_y = y + move_y;
-
-		if (new_y >= maximal_y) {
-			new_y = maximal_y - 1;
-		} else if (new_y < 0) {
-			new_y = 0;
-		}
-		return new_y;
-	}
-
-	private void start(Remote remote, Request request) {
-		/*
-		 * ^ Timer timer=new Timer(); timer.schedule(new TimerTask(){
-		 * 
-		 * @Override public void run() { remote.stop(); this.cancel(); } },
-		 * request.getRuntime());
-		 * 
-		 * Timer timer2=new Timer(); timer.schedule(new TimerTask(){
-		 * 
-		 * @Override public void run() { Random rand=new Random(); int
-		 * x=rand.nextInt(x_max); int y=rand.nextInt(y_max);
-		 * remote=remote.move(x, y); } },0, request.getRuntime()/3);
-		 */
-	}
-
-	/*
-	 * private void shutDown(Remote remote, Request request){ Timer timer=new
-	 * Timer(); timer.schedule(new TimerTask(){
-	 * 
-	 * @Override public void run() { remote.stop(); this.cancel(); } },
-	 * request.getRuntime()); }
-	 */
-
-	/*
-	 * TODO: Simulate Failures
-	 */
 }
