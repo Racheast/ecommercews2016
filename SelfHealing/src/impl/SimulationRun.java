@@ -81,7 +81,7 @@ public class SimulationRun implements Runnable {
 		int needed_memory = Math.abs((int) Math.round(rand.nextGaussian() * 15 + 1000));
 		int needed_cpu = Math.abs((int) Math.round(rand.nextGaussian() * 15 + 1500));
 		int needed_bandwidth = Math.abs((int) Math.round(rand.nextGaussian() * 15 + 1500));
-		int needed_size = Math.abs((int) Math.round(rand.nextGaussian() * 1.75 + 1));
+		int needed_size = rand.nextInt(3) + 1;
 		int runtime = Math.abs((int) Math.round(rand.nextGaussian() * 7000 + 10000)); // runtime
 
 		return new VM(generateRequest(), needed_size, needed_cpu, needed_memory, needed_bandwidth, runtime);
@@ -115,7 +115,7 @@ public class SimulationRun implements Runnable {
 				VM vm = generateVM();
 				System.out.println("SIMULATOR: Request generated: " + vm + "\n");
 
-				Remote remote = controller.sendRequest(vm);
+				Remote remote = controller.sendVM(vm);
 
 				if (remote != null) {
 					long end = System.currentTimeMillis() + vm.getRuntime();

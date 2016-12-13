@@ -40,24 +40,52 @@ public class EdgeController implements RemoteController {
 	}
 
 	// FIFO realization for handling requests
-	public synchronized RemoteClient sendRequest(VM vm) {
-		ArrayList<Edge> sortedEdges = this.generateSortedDistanceList(this.getListOfEdges(), vm.getRequest());
-
-		for (Edge e : sortedEdges) {
-			System.out.println("CONTROLLER: SEND REQUEST OPERATION: " + vm.compactString() + " forwarded to edge"
-					+ e.getID() + "\n");
-			VM newVM = e.assignRequest(vm);
-
-			if (newVM != null) {
-				RemoteClient remoteClient = new RemoteClient();
-				remoteClient.setVM(newVM);
-				remoteClient.setController(this);
-				return remoteClient;
-			}
+	public synchronized RemoteClient sendVM(VM vm) {
+		ArrayList<SLAError> slaErrors = new ArrayList<SLAError>();
+		// check if vm-specs don't violate the SLAs which are assigned to the
+		// request
+		if (vm.getCpu() > vm.getRequest().getSla().getAgreedCPU()) {
+			//slaErrors.add(new SLAError(SLAField.agreedCPU, "Requested more than specified in the SLA."));
 		}
 
-		System.out.println("CONTROLLER: SEND REQUEST OPERATION: No proper edges found!\n");
-		// add the counter of mistakes
+		if (vm.getMemory() > vm.getRequest().getSla().getAgreedMemory()) {
+			//slaErrors.add(new SLAError(SLAField.agreedMemory, "Requested more than specified in the SLA."));
+		}
+
+		if (vm.getSize() > vm.getRequest().getSla().getAgreedSize()) {
+			slaErrors.add(new SLAError(SLAField.agreedSize, "Requested more than specified in the SLA."));
+		}
+
+		if (vm.getNetworkBandwidth() > vm.getRequest().getSla().getAgreedNetworkBandwidth()) {
+			//slaErrors.add(new SLAError(SLAField.agreedCPU, "Requested more than specified in the SLA."));
+		}
+
+		if (slaErrors.size() == 0) {
+
+			ArrayList<Edge> sortedEdges = this.generateSortedDistanceList(this.getListOfEdges(), vm.getRequest());
+
+			for (Edge e : sortedEdges) {
+				System.out.println("CONTROLLER: SEND REQUEST OPERATION: " + vm.compactString() + " forwarded to edge"
+						+ e.getID() + "\n");
+				VM newVM = e.assignRequest(vm);
+
+				if (newVM != null) {
+					RemoteClient remoteClient = new RemoteClient();
+					remoteClient.setVM(newVM);
+					remoteClient.setController(this);
+					return remoteClient;
+				}
+			}
+
+			System.out.println("CONTROLLER: SEND REQUEST OPERATION: No proper edges found!\n");
+			// add the counter of mistakes
+		} else {
+			System.out.println("CONTROLLER: SEND REQUEST OPERATION: Following SLA violations occured in " + vm.compactString() + ": ");
+			for (SLAError e : slaErrors) {
+				System.out.println(e);
+			}
+			System.out.println(vm.compactString()+" could not be forwarded\n");
+		}
 		return null;
 	}
 
@@ -165,7 +193,8 @@ public class EdgeController implements RemoteController {
 			if (pm != null) {
 				if (pm.getID() != vm.getAddress().getPM_ID()) {
 					double v_mig = migrateVM(vm, pm, getMemoryTransmissionRate(sourceEdge, targetEdge));
-					double u_mig = 0.9 * v_mig  +0.1; //u_mig = alpha * v_mig + beta
+					double u_mig = 0.9 * v_mig + 0.1; // u_mig = alpha * v_mig +
+														// beta
 					VM newVM = pm.startApplication(vm);
 					newVM.getAddress().setEdge_ID(targetEdge.getID());
 					System.out.println("CONTROLLER: MOVE OPERATION:" + vm.compactString() + " copied from "

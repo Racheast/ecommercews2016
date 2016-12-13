@@ -2,28 +2,28 @@ package impl;
 
 public class SLA {
 
-	private int size;
-	private int agreedMemory;
-	private int agreedCPU;
-	private int networkBandwidth;
-	private int networkBandwidthBEdges;
-	private int latency;
-	private double infrasrtuctureAvailability;
-
-	public SLA(int size, int agreedMemory, int agreedCPU, int networkBandwidth, int networkBandwidthBEdges, int latency,
-			double d) {
+	private final int agreedSize;
+	private final int agreedMemory;
+	private final int agreedCPU;
+	private final int agreedNetworkBandwidth;
+	private final int agreedNetworkBandwidthBEdges;
+	private final int agreedLatency;
+	private final double agreedInfrasrtuctureAvailability;
+	
+	public SLA(int agreedSize, int agreedMemory, int agreedCPU, int agreedNetworkBandwidth,
+			int agreedNetworkBandwidthBEdges, int agreedLatency, double agreedInfrasrtuctureAvailability) {
 		super();
-		this.size = size;
+		this.agreedSize = agreedSize;
 		this.agreedMemory = agreedMemory;
 		this.agreedCPU = agreedCPU;
-		this.networkBandwidth = networkBandwidth;
-		this.networkBandwidthBEdges = networkBandwidthBEdges;
-		this.latency = latency;
-		this.infrasrtuctureAvailability = d;
+		this.agreedNetworkBandwidth = agreedNetworkBandwidth;
+		this.agreedNetworkBandwidthBEdges = agreedNetworkBandwidthBEdges;
+		this.agreedLatency = agreedLatency;
+		this.agreedInfrasrtuctureAvailability = agreedInfrasrtuctureAvailability;
 	}
 
-	public int getSize() {
-		return size;
+	public int getAgreedSize() {
+		return agreedSize;
 	}
 
 	public int getAgreedMemory() {
@@ -34,21 +34,23 @@ public class SLA {
 		return agreedCPU;
 	}
 
-	public int getNetworkBandwidth() {
-		return networkBandwidth;
+	public int getAgreedNetworkBandwidth() {
+		return agreedNetworkBandwidth;
 	}
 
-	public int getNetworkBandwidthBEdges() {
-		return networkBandwidthBEdges;
+	public int getAgreedNetworkBandwidthBEdges() {
+		return agreedNetworkBandwidthBEdges;
 	}
 
-	public int getLatency() {
-		return latency;
+	public int getAgreedLatency() {
+		return agreedLatency;
 	}
 
-	public double getInfrasrtuctureAvailability() {
-		return infrasrtuctureAvailability;
+	public double getAgreedInfrasrtuctureAvailability() {
+		return agreedInfrasrtuctureAvailability;
 	}
+
+	
 
 	
 }
