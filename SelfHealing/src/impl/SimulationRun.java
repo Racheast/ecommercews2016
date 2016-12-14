@@ -11,9 +11,10 @@ public class SimulationRun implements Runnable {
 	private final int x_max;
 	private final int y_max;
 	private HashMap<Integer, SLA> slas;
+	private HashMap<Integer, VM> vms;
 
 	public SimulationRun(int x_max, int y_max) {
-
+		vms = new HashMap<Integer, VM>();
 		slas = new HashMap<Integer, SLA>();
 		SLA sla1 = new SLA(1, 3, 4, 54, 600, 70, 0.9995);
 		SLA sla2 = new SLA(2, 4, 8, 108, 600, 90, 0.9895);
@@ -42,7 +43,8 @@ public class SimulationRun implements Runnable {
 					Edge edge = new Edge(x, y, u0, bandwidth);
 					System.out.println(edge);
 					randNr = rand.nextInt(10) + 1;
-					edge.installPms(generatePMs(randNr)); // max 10 PMs per edge !!
+					edge.installPms(generatePMs(randNr)); // max 10 PMs per edge
+															// !!
 					controller.addEdge(x, y, edge);
 				}
 			}
@@ -103,6 +105,9 @@ public class SimulationRun implements Runnable {
 		EdgeController controller = initEdgeController();
 		System.out.println(controller.printMap() + "\n");
 
+		GridMonitor gridMonitor = new GridMonitor(controller.getMap());
+		gridMonitor.showMonitor();
+
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 
@@ -111,8 +116,9 @@ public class SimulationRun implements Runnable {
 
 			@Override
 			public void run() {
-
+				
 				VM vm = generateVM();
+				vms.put(vm.getID(), vm);
 				System.out.println("SIMULATOR: Request generated: " + vm + "\n");
 
 				Remote remote = controller.sendVM(vm);
