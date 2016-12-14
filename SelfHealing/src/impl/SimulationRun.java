@@ -119,6 +119,8 @@ public class SimulationRun implements Runnable {
 				
 				VM vm = generateVM();
 				vms.put(vm.getID(), vm);
+				gridMonitor.addLocationElement(vm.getRequest());
+				gridMonitor.reprintMap();
 				System.out.println("SIMULATOR: Request generated: " + vm + "\n");
 
 				Remote remote = controller.sendVM(vm);
@@ -135,9 +137,9 @@ public class SimulationRun implements Runnable {
 							if (System.currentTimeMillis() < end) {
 								int old_x = vm.getRequest().getxCoordinate();
 								int old_y = vm.getRequest().getyCoordinate();
-								vm.getRequest().setxCoordinate(randomStep(vm.getRequest().getxCoordinate(), x_max));
-								vm.getRequest().setyCoordinate(randomStep(vm.getRequest().getyCoordinate(), y_max));
-
+								randomlyMoveVM(vm);
+								gridMonitor.moveLocationElement(old_x, old_y, vm.getRequest());
+								
 								System.out.println("SIMULATOR: Moving " + vm.getRequest().compactString() + " from ("
 										+ old_x + "/" + old_y + ") to (" + vm.getRequest().getxCoordinate() + "/"
 										+ vm.getRequest().getyCoordinate() + ")\n");
@@ -145,6 +147,7 @@ public class SimulationRun implements Runnable {
 							} else {
 								System.out.println("SIMULATOR: Cancelling " + vm.getRequest().compactString() + "\n");
 								remote.stop();
+								gridMonitor.deleteLocationElement(vm.getRequest());
 								this.cancel();
 							}
 						}
@@ -152,9 +155,14 @@ public class SimulationRun implements Runnable {
 				}
 
 			}
-		}, 0, 10000); // generating new requests
+		}, 0, 1000000); // generating new requests
 	}
-
+	
+	private void randomlyMoveVM(VM vm){
+		vm.getRequest().setxCoordinate(randomStep(vm.getRequest().getxCoordinate(), x_max));
+		vm.getRequest().setyCoordinate(randomStep(vm.getRequest().getyCoordinate(), y_max));
+	}
+	
 	private int randomStep(int c, int max_c) {
 		Random rand = new Random();
 		int step = rand.nextInt(3) - 1; // step out of [-1,0,+1]

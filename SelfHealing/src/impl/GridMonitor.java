@@ -47,7 +47,7 @@ public class GridMonitor extends JFrame { // This is the window class
 		}
 		
 		this.add(panel);
-		this.update();
+		this.reprintMap();
 
 	}
 
@@ -55,12 +55,8 @@ public class GridMonitor extends JFrame { // This is the window class
 		vms.put(vm.getID(), vm);
 	}
 
-	public void update() {
-		for(int x=0; x<max_x; x++){
-			for(int y=0; y<max_y; y++){
-				System.out.println(edgeArray[x][y]);
-			}
-		}
+	public void reprintMap() {
+		
 		this.panel.removeAll();
 		JLabel[][] labels = new JLabel[max_y][max_x];
 
@@ -68,18 +64,18 @@ public class GridMonitor extends JFrame { // This is the window class
 			for (int x = 0; x < max_x; x++) {
 				HashMap<Integer, LocationElement> locationElements = locationCells[x][y].getLocationElements();
 				Set<Integer> keys = locationElements.keySet();
-
+				
 				String cellString = "";
 				
 				for (int key : keys) {
 					LocationElement l = locationElements.get(key);
 					if (l != null) {
-						if (l.getClass().isInstance(Edge.class)) {
+						if (l instanceof Edge) {
 							Edge e = (Edge) l;
 							cellString += e.compactString() + "(" + e.getxCoordinate() + "," + e.getyCoordinate() + ")"
 									+ "\n";
 							
-						} else if (l.getClass().isInstance(Request.class)) {
+						} else if (l instanceof Request) {
 							Request r = (Request) l;
 							cellString += r.compactString() + "(" + r.getxCoordinate() + "," + r.getyCoordinate() + ")"
 									+ "\n";
@@ -89,7 +85,6 @@ public class GridMonitor extends JFrame { // This is the window class
 					}
 
 				} // end of for keys
-				
 				labels[y][x] = new JLabel(cellString);
 				panel.add(labels[y][x]);
 			} // end of for x
@@ -119,7 +114,29 @@ public class GridMonitor extends JFrame { // This is the window class
 		}
 		return requestArray;
 	}
-
+	
+	public void moveLocationElement(int old_x, int old_y, LocationElement l){
+		int new_x=l.getxCoordinate();
+		int new_y=l.getyCoordinate();
+		System.out.println("GridMonitor.moveLocationElement(): old_x="+old_x+", old_y="+old_y+"\nnew_x="+new_x+", new_y="+new_y);
+		if(locationCells[old_x][old_y].getLocationElements().containsKey(l.getID())){
+			locationCells[old_x][old_y].getLocationElements().remove(l.getID());
+			locationCells[new_x][new_y].getLocationElements().put(l.getID(), l);
+		}
+		
+		this.reprintMap();
+	}
+	
+	public void deleteLocationElement(LocationElement l){
+		int x=l.getxCoordinate();
+		int y=l.getyCoordinate();
+		if(locationCells[x][y].getLocationElements().containsKey(l.getID())){
+			locationCells[x][y].getLocationElements().remove(l.getID());
+		}
+		
+		this.reprintMap();
+	}
+	
 	public void addLocationElement(LocationElement l) {
 		this.locationCells[l.getxCoordinate()][l.getyCoordinate()].getLocationElements().put(l.getID(), l);
 	}
