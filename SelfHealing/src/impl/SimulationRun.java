@@ -94,7 +94,7 @@ public class SimulationRun implements Runnable {
 		int xCoordinate = rand.nextInt(x_max);
 		int yCoordinate = rand.nextInt(y_max);
 		int slaID = rand.nextInt(3) + 1; // we randomize SLA selection
-
+		
 		return new Request(xCoordinate, yCoordinate, slas.get(slaID));
 	}
 
@@ -147,13 +147,12 @@ public class SimulationRun implements Runnable {
 							} else {
 								System.out.println("SIMULATOR: Cancelling " + vm.getRequest().compactString() + "\n");
 								remote.stop();
-								gridMonitor.deleteLocationElement(vm.getRequest());
+								//gridMonitor.deleteLocationElement(vm.getRequest());
 								this.cancel();
 							}
 						}
 					}, 2000, 1000); // moving requests (=users) across the map
 				}
-
 			}
 		}, 0, 1000000); // generating new requests
 	}

@@ -56,8 +56,9 @@ public class GridMonitor extends JFrame { // This is the window class
 	}
 
 	public void reprintMap() {
-		
+		this.panel = (JPanel)this.panel;
 		this.panel.removeAll();
+		
 		JLabel[][] labels = new JLabel[max_y][max_x];
 
 		for (int y = 0; y < max_y; y++) {
@@ -87,32 +88,12 @@ public class GridMonitor extends JFrame { // This is the window class
 				} // end of for keys
 				labels[y][x] = new JLabel(cellString);
 				panel.add(labels[y][x]);
+				
 			} // end of for x
 		} // end of for y
-
-		
 		panel.revalidate();
 		panel.repaint();
-	}
-
-	private VM[][] getVMArray(HashMap<Integer, VM> vms) {
-		VM[][] vmsArray = new VM[max_x][max_y];
-		Set<Integer> keys = vms.keySet();
-		for (int key : keys) {
-			VM vm = vms.get(key);
-			vmsArray[vm.getRequest().getxCoordinate()][vm.getRequest().getyCoordinate()] = vm;
-		}
-		return vmsArray;
-	}
-
-	private Request[][] getRequestArray(HashMap<Integer, VM> vms) {
-		Request[][] requestArray = new Request[max_x][max_y];
-		Set<Integer> keys = vms.keySet();
-		for (int key : keys) {
-			VM vm = vms.get(key);
-			requestArray[vm.getRequest().getxCoordinate()][vm.getRequest().getyCoordinate()] = vm.getRequest();
-		}
-		return requestArray;
+		
 	}
 	
 	public void moveLocationElement(int old_x, int old_y, LocationElement l){
@@ -125,9 +106,11 @@ public class GridMonitor extends JFrame { // This is the window class
 		}
 		
 		this.reprintMap();
+		
 	}
 	
 	public void deleteLocationElement(LocationElement l){
+		System.out.println("deleteLocationElement: "+l);
 		int x=l.getxCoordinate();
 		int y=l.getyCoordinate();
 		if(locationCells[x][y].getLocationElements().containsKey(l.getID())){
@@ -138,6 +121,7 @@ public class GridMonitor extends JFrame { // This is the window class
 	}
 	
 	public void addLocationElement(LocationElement l) {
+		System.out.println("addLocationElement: "+l);
 		this.locationCells[l.getxCoordinate()][l.getyCoordinate()].getLocationElements().put(l.getID(), l);
 	}
 

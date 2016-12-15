@@ -53,7 +53,7 @@ public class EdgeController implements RemoteController {
 		}
 
 		if (vm.getSize() > vm.getRequest().getSla().getAgreedSize()) {
-			slaErrors.add(new SLAError(SLAField.agreedSize, "Requested more than specified in the SLA."));
+			//slaErrors.add(new SLAError(SLAField.agreedSize, "Requested more than specified in the SLA."));
 		}
 
 		if (vm.getNetworkBandwidth() > vm.getRequest().getSla().getAgreedNetworkBandwidth()) {
