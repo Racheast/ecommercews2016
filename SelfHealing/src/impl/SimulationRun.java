@@ -84,7 +84,7 @@ public class SimulationRun implements Runnable {
 		int needed_cpu = Math.abs((int) Math.round(rand.nextGaussian() * 15 + 1500));
 		int needed_bandwidth = Math.abs((int) Math.round(rand.nextGaussian() * 15 + 1500));
 		int needed_size = rand.nextInt(3) + 1;
-		int runtime = Math.abs((int) Math.round(rand.nextGaussian() * 7000 + 10000)); // runtime
+		int runtime = Math.abs((int) Math.round(rand.nextGaussian() * 7000 + 100000)); // runtime
 
 		return new VM(generateRequest(), needed_size, needed_cpu, needed_memory, needed_bandwidth, runtime);
 	}
@@ -104,10 +104,14 @@ public class SimulationRun implements Runnable {
 		System.out.println("SIMULATOR: Initializing map...");
 		EdgeController controller = initEdgeController();
 		System.out.println(controller.printMap() + "\n");
-
-		GridMonitor gridMonitor = new GridMonitor(controller.getMap());
-		gridMonitor.showMonitor();
-
+		Monitor monitor=new Monitor(controller);
+		monitor.start();
+		//GridMonitor gridMonitor = new GridMonitor(controller.getMap());
+		//gridMonitor.showMonitor();
+		
+		//GridMonitor2 gridMonitor2 = new GridMonitor2(controller.getMap(),vms);
+		//gridMonitor2.showMonitor();
+		
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 
@@ -119,12 +123,11 @@ public class SimulationRun implements Runnable {
 				
 				VM vm = generateVM();
 				vms.put(vm.getID(), vm);
-				gridMonitor.addLocationElement(vm.getRequest());
-				gridMonitor.reprintMap();
+				//gridMonitor.addLocationElement(vm.getRequest());
+				//gridMonitor.reprintMap();
 				System.out.println("SIMULATOR: Request generated: " + vm + "\n");
 
 				Remote remote = controller.sendVM(vm);
-
 				if (remote != null) {
 					long end = System.currentTimeMillis() + vm.getRuntime();
 
@@ -138,7 +141,7 @@ public class SimulationRun implements Runnable {
 								int old_x = vm.getRequest().getxCoordinate();
 								int old_y = vm.getRequest().getyCoordinate();
 								randomlyMoveVM(vm);
-								gridMonitor.moveLocationElement(old_x, old_y, vm.getRequest());
+								//gridMonitor.moveLocationElement(old_x, old_y, vm.getRequest());
 								
 								System.out.println("SIMULATOR: Moving " + vm.getRequest().compactString() + " from ("
 										+ old_x + "/" + old_y + ") to (" + vm.getRequest().getxCoordinate() + "/"
@@ -154,7 +157,7 @@ public class SimulationRun implements Runnable {
 					}, 2000, 1000); // moving requests (=users) across the map
 				}
 			}
-		}, 0, 1000000); // generating new requests
+		}, 0, 100); // generating new requests
 	}
 	
 	private void randomlyMoveVM(VM vm){

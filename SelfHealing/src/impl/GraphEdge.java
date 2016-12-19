@@ -2,24 +2,39 @@ package impl;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 
-public class GraphEdge extends JComponent {
-	private int x1,x2;
-	private int y1,y2;
-	public GraphEdge(int x1, int x2, int y1, int y2){
+public class GraphEdge extends JPanel{
+	private int x,y;
+	public GraphEdge(int x, int y){
 		super();
-		this.x1=x1;
-		this.y1=y1;
-		this.x2=x2;
-		this.y2=y2;
+		this.x=x;
+		this.y=y;
 	}
 	@Override
 	public void paintComponent(Graphics g){
-		g.setColor(Color.RED);
-		g.drawLine(150,150,375,375);
+		//g.drawOval(0,0,10,10);
+		//g.fillOval(0, 0, 10, 10);
+		/*
+		BufferedImage img;
+		try {
+			img = ImageIO.read(getClass().getResource("/images/server_icon.png"));			
+			g.drawImage(img, 0, 0, 30,30,this);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
+
+		System.out.println("GraphEdge: Drawing at x="+x+", y="+y);
+		g.drawRect(x, y, 20, 40);
+		g.setColor(Color.BLACK);
 	}
+	
 }

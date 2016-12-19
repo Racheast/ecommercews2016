@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import Comparables.ComparableEdge;
 import Interfaces.LocationElement;
@@ -227,6 +228,15 @@ public class EdgeController implements RemoteController {
 			totalDataVolume += dataVolume;
 		}
 		return totalDataVolume;
+	}
+	
+	public double getTotalEnergyUtilization(){
+		double u_total=0;
+		Set<Integer> keys=edges.keySet();
+		for(int key:keys){
+			u_total+=edges.get(key).getEnergyUtilization();
+		}
+		return u_total;
 	}
 
 }

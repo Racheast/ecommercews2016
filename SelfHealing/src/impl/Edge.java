@@ -140,7 +140,7 @@ public class Edge implements LocationElement {
 		double u_total = u0;
 		Set<Integer> keys = pms.keySet();
 		for (int key : keys) {
-			u0 += pms.get(key).getEnergyUtilization();
+			u_total += pms.get(key).getEnergyUtilization();
 		}
 		return u_total;
 	}

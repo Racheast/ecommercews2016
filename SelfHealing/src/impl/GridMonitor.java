@@ -24,10 +24,6 @@ public class GridMonitor extends JFrame { // This is the window class
 	private HashMap<Integer, VM> vms;
 
 	private LocationCell[][] locationCells;
-		
-	
-	GraphNode gn1=new GraphNode(Color.BLUE);
-	GraphNode gn2=new GraphNode(Color.GREEN);
 	
 	public GridMonitor(Edge[][] edgeArray) {
 		this.max_x = edgeArray.length;
@@ -49,8 +45,6 @@ public class GridMonitor extends JFrame { // This is the window class
 		glassPanel.setSize(this.windowWidth, this.windowHeight);
 		glassPanel.setBackground(Color.GREEN);
 		glassPanel.setOpaque(false);
-		JLabel[][] labels = new JLabel[max_y][max_x];
-
 		
 		this.locationCells = new LocationCell[max_x][max_y];
 		for(int y=0; y<max_y; y++){
@@ -90,44 +84,34 @@ public class GridMonitor extends JFrame { // This is the window class
 				HashMap<Integer, LocationElement> locationElements = locationCells[x][y].getLocationElements();
 				Set<Integer> keys = locationElements.keySet();
 				
-				String cellString = "";
+				//String cellString = "";
+				gridPanel.add(new GraphRequest(Color.WHITE));
 				
 				for (int key : keys) {
 					LocationElement l = locationElements.get(key);
 					if (l != null) {
 						if (l instanceof Edge) {
 							Edge e = (Edge) l;
-							cellString += e.compactString() + "(" + e.getxCoordinate() + "," + e.getyCoordinate() + ")"
-									+ "\n";
+							//gridPanel.add(new GraphEdge(Color.BLACK));
+							//cellString += e.compactString() + "(" + e.getxCoordinate() + "," + e.getyCoordinate() + ")"
+									//+ "\n";
 							
 						} else if (l instanceof Request) {
 							Request r = (Request) l;
-							cellString += r.compactString() + "(" + r.getxCoordinate() + "," + r.getyCoordinate() + ")"
-									+ "\n";
-							
-						}
-
+							//gridPanel.add(new GraphRequest(Color.RED));
+							//cellString += r.compactString() + "(" + r.getxCoordinate() + "," + r.getyCoordinate() + ")"
+									//+ "\n";
+						} 
 					}
 
 				} // end of for keys
 				//labels[y][x] = new JLabel(cellString);
 				//gridPanel.add(labels[y][x]);
 				
-				if(x==2 && y==2){
-					gridPanel.add(gn1);
-				}
-				else if(x==5 && y==5){
-					gridPanel.add(gn2);
-				}else{
-					gridPanel.add(new GraphNode(Color.WHITE));
-				}
 				
 			} // end of for x
 		} // end of for y
-		GraphEdge ge=new GraphEdge(2,2,5,5);
-		System.out.println("gn1 coordinates: "+gn1.getX()+", "+gn1.getY());
-		System.out.println("gn2 coordinates: "+gn2.getX()+", "+gn2.getY());
-		glassPanel.add(ge);
+		
 		gridPanel.revalidate();
 		gridPanel.repaint();
 		
