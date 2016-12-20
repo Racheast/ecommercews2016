@@ -99,7 +99,7 @@ public class TimeSeriesMonitor extends ApplicationFrame {
 		ValueAxis axis=this.chart.getXYPlot().getDomainAxis();
 		axis.resizeRange(0.0, 100000);
 		series.add(currentSecond, value1);
-		series2.add(currentSecond, value2 + 700.0);
+		series2.add(currentSecond, value2);
 	}
 
 	public void showChart() {

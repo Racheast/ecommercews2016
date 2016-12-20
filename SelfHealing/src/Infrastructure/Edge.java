@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Set;
 
 import comparables.ComparablePM;
+import exceptions.EdgeFailureException;
 import interfaces.LocationElement;
 import interfaces.Remote;
 import interfaces.SpecificationElement;
@@ -145,7 +146,7 @@ public class Edge implements LocationElement {
 		return u_total;
 	}
 
-	private synchronized ArrayList<PM> getListOfPMs() {
+	public synchronized ArrayList<PM> getListOfPMs() {
 		Set<Integer> keys = pms.keySet();
 		ArrayList<PM> pmList = new ArrayList<PM>();
 		for (int key : keys) {
@@ -184,6 +185,10 @@ public class Edge implements LocationElement {
 			sortedPMs.add(cpm.getPm());
 		}
 		return sortedPMs;
+	}
+	
+	public void simulateEdgeFailure() throws EdgeFailureException{
+		throw new EdgeFailureException(compactString()+": FAILURE OCCURRED!");
 	}
 
 }

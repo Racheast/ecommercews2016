@@ -8,6 +8,8 @@ import java.util.Random;
 import java.util.Set;
 
 import comparables.ComparableEdge;
+import exceptions.EdgeFailureException;
+import exceptions.PMFailureException;
 import interfaces.LocationElement;
 import interfaces.Remote;
 import interfaces.RemoteController;
@@ -246,6 +248,64 @@ public class EdgeController implements RemoteController {
 			u_total+=edges.get(key).getEnergyUtilization();
 		}
 		return u_total;
+	}
+	
+	public synchronized void simulatePMFailure(){
+		Random r=new Random();
+		ArrayList<Integer> pm_ids=getAllPMIDs();
+		int numberFails=(int)Math.abs(Math.round(r.nextGaussian()*2 + pm_ids.size()*0.1));
+		
+		for(int i=0; i<numberFails; i++){
+			int i2=r.nextInt(pm_ids.size());
+			PM pm=getPMbyID(pm_ids.get(i2));
+			pm_ids.remove(i2);
+			if(pm!=null){
+				try{
+					pm.simulatePMFailure();
+				}catch(PMFailureException e){
+					//TODO: Exceptionhandling (maybe generate Error-Erray and return it after completion)
+				}
+			}
+		}
+	}
+	
+	public synchronized void simulateEdgeFailure(){
+		ArrayList<Integer> edge_ids=new ArrayList<Integer>(edges.keySet());
+		Random r=new Random();
+		int numberFails=(int)Math.abs(Math.round(r.nextGaussian()*2 + edge_ids.size()*0.17));
+		
+		for(int i=0; i<numberFails; i++){
+			int i2=r.nextInt(edge_ids.size());
+			Edge edge=edges.get(edge_ids.get(i2));
+			edge_ids.remove(i2);
+			if(edge!=null){
+				try{	
+					edge.simulateEdgeFailure();
+				}catch(EdgeFailureException e){
+					//TODO: Exceptionhandling (maybe generate Error-Erray and return it after completion)					
+				}
+			}
+		}
+	}
+	
+	private ArrayList<Integer> getAllPMIDs(){
+		ArrayList<Integer> pm_ids=new ArrayList<Integer>();
+		for(Edge e:getListOfEdges()){
+			for(int pm_id:e.getPms().keySet()){
+				pm_ids.add(pm_id);
+			}
+		}
+		return pm_ids;
+	}
+	
+	private PM getPMbyID(int id){
+		for(Edge e:getListOfEdges()){
+			PM p=e.getPms().get(id);
+			if(p!=null){
+				return p;
+			}
+		}
+		return null;
 	}
 
 }

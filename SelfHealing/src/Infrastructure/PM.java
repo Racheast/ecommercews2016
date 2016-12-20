@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import exceptions.PMFailureException;
 import interfaces.SpecificationElement;
 
 public class PM {
@@ -164,6 +165,10 @@ public class PM {
 
 	public String compactString() {
 		return "PM" + ID;
+	}
+	
+	public void simulatePMFailure() throws PMFailureException{
+		throw new PMFailureException(compactString()+": FAILURE OCCURRED!");
 	}
 
 }

@@ -25,7 +25,6 @@ public class Monitor {
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				System.out.println("MONITOR: getTotalEnergyUtil()="+edgeController1.getTotalEnergyUtilization());
 				t.updateSeries(edgeController1.getTotalEnergyUtilization(), edgeController2.getTotalEnergyUtilization());
 			}
 		}, 0, 1000);

@@ -11,8 +11,7 @@ import Infrastructure.PM;
 import Infrastructure.Request;
 import Infrastructure.VM;
 import interfaces.Remote;
-import interfaces.RemoteController;
-import monitoring.Monitor;
+
 import sla.SLA;
 
 public class SimulationRun{
@@ -22,6 +21,7 @@ public class SimulationRun{
 	private HashMap<Integer, VM> vms;
 	private final Timer timer;
 	private final EdgeController controller;
+	private FailureSimulator failureSimulator;
 	
 	/*
 	 * Randomized constructor
@@ -33,6 +33,7 @@ public class SimulationRun{
 		this.x_max = x_max;
 		this.y_max = y_max;
 		this.controller = new EdgeController(generateRandomEdgeMap(), improved);
+		this.failureSimulator=new FailureSimulator(controller);
 	}
 	
 	/*
@@ -194,5 +195,5 @@ public class SimulationRun{
 	public EdgeController getController() {
 		return controller;
 	}
-	
+
 }

@@ -5,6 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import Infrastructure.Request;
+import Infrastructure.VM;
 import interfaces.Remote;
 
 public class MoveSimulator {
@@ -22,7 +23,7 @@ public class MoveSimulator {
 	
 	public void start(){
 		if (remote != null) {
-			long end = System.currentTimeMillis() + this.remote.getVM().getRuntime();
+			long end = System.currentTimeMillis() + remote.getVM().getRuntime();
 
 			timer.schedule(new TimerTask() {
 
