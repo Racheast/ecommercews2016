@@ -185,7 +185,7 @@ public class SimulationRun{
 					moveSimulator.start();
 				}
 			}
-		}, 0, 100); // generating new requests
+		}, 0, 1500); // generating new requests
 	}
 	
 	public void stop(){
