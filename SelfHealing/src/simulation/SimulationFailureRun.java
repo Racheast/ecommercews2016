@@ -12,10 +12,9 @@ import infrastructure.PM;
 import infrastructure.Request;
 import infrastructure.VM;
 import interfaces.Remote;
-
 import sla.SLA;
 
-public class SimulationRun{
+public class SimulationFailureRun{
 	private final int x_max;
 	private final int y_max;
 	private HashMap<Integer, SLA> slas;
@@ -27,25 +26,27 @@ public class SimulationRun{
 	/*
 	 * Randomized constructor
 	 */
-	public SimulationRun(int x_max, int y_max, boolean improved) {
+	public SimulationFailureRun(int x_max, int y_max, boolean improved, CommonType simuType, CommonType handType) {
 		this.timer=new Timer();
 		vms = new HashMap<Integer, VM>();
 		slas = generateSLAs();
 		this.x_max = x_max;
 		this.y_max = y_max;
 		this.controller = new EdgeController(generateRandomEdgeMap(), improved);
+		this.failureSimulator = new FailureSimulator(x_max,y_max,slas,vms,timer,controller,handType,simuType);
 	}
 	
 	/*
 	 * Non-randomized constructor
 	 */
-	public SimulationRun(boolean improved){
+	public SimulationFailureRun(boolean improved, CommonType simuType, CommonType handType){
 		this.timer=new Timer();
 		this.x_max=10;
 		this.y_max=10;
 		vms = new HashMap<Integer, VM>();
 		slas = generateSLAs();
 		this.controller = new EdgeController(generateFixedEdgeMap(), improved);
+		this.failureSimulator = new FailureSimulator(x_max,y_max,slas,vms,timer,controller,handType,simuType);
 	}
 	
 	private HashMap<Integer, SLA> generateSLAs(){
@@ -194,6 +195,10 @@ public class SimulationRun{
 
 	public EdgeController getController() {
 		return controller;
+	}
+
+	public FailureSimulator getFailureSimulator() {
+		return failureSimulator;
 	}
 
 }

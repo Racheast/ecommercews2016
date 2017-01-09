@@ -164,7 +164,7 @@ public class PM {
 	}
 
 	public String compactString() {
-		return "PM" + ID;
+		return "PM - " + ID;
 	}
 	
 	public void simulatePMFailure() throws PMFailureException{

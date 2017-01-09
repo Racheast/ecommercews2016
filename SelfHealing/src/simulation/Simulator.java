@@ -13,6 +13,7 @@ public class Simulator {
 		baselineRun.start();
 		Monitor monitor=new Monitor(improvedRun.getController(), baselineRun.getController());
 		monitor.start();
+
 	}
 
 }

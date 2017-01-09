@@ -308,4 +308,7 @@ public class EdgeController implements RemoteController {
 		return null;
 	}
 
+	public HashMap<Integer, Edge> getEdges() {
+		return edges;
+	}
 }

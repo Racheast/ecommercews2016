@@ -171,7 +171,7 @@ public class Edge implements LocationElement {
 	}
 
 	public String compactString() {
-		return "Edge" + ID;
+		return "Edge - " + ID;
 	}
 
 	private ArrayList<PM> generateSortedEnergyList(VM vm, ArrayList<PM> pms) {
