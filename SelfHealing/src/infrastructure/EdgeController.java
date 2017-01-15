@@ -210,7 +210,7 @@ public class EdgeController implements RemoteController {
 					VM newVM = pm.startApplication(vm);
 					newVM.getAddress().setEdge_ID(targetEdge.getID());
 					System.out.println("CONTROLLER: MOVE OPERATION:" + vm.compactString() + " copied from "
-							+ vm.getAddress().compactString() + " to " + newVM.getAddress().compactString() + "\n");
+							+ vm.getAddress().compactString() + " to " + newVM.getAddress().compactString() + ". Migration energy utilization="+u_mig+"\n");
 					stop(vm);
 					return newVM;
 				} else {
