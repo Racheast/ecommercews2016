@@ -1,4 +1,4 @@
-package Infrastructure;
+package infrastructure;
 
 public class Address {
 	private int Edge_ID;

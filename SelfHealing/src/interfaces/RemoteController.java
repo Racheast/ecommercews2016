@@ -1,8 +1,8 @@
 package interfaces;
 
-import Infrastructure.Address;
-import Infrastructure.RemoteClient;
-import Infrastructure.VM;
+import infrastructure.Address;
+import infrastructure.RemoteClient;
+import infrastructure.VM;
 
 public interface RemoteController {
 	public boolean stop(VM vm);

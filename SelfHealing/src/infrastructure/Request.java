@@ -1,4 +1,4 @@
-package Infrastructure;
+package infrastructure;
 import interfaces.LocationElement;
 import interfaces.SpecificationElement;
 import sla.SLA;

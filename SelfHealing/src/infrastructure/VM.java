@@ -1,4 +1,4 @@
-package Infrastructure;
+package infrastructure;
 import java.util.Timer;
 import java.util.TimerTask;
 

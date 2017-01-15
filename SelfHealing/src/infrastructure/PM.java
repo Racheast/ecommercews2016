@@ -1,4 +1,4 @@
-package Infrastructure;
+package infrastructure;
 
 import java.util.ArrayList;
 import java.util.HashMap;

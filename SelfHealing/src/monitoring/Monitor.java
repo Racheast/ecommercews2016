@@ -3,7 +3,7 @@ package monitoring;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import Infrastructure.EdgeController;
+import infrastructure.EdgeController;
 
 public class Monitor {
 	private final EdgeController edgeController1;

@@ -5,9 +5,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 
-import Infrastructure.Edge;
-import Infrastructure.EdgeController;
-import Infrastructure.PM;
+import infrastructure.Edge;
+import infrastructure.EdgeController;
+import infrastructure.PM;
 
 public class FailureSimulator implements Runnable {
 	private final EdgeController controller;

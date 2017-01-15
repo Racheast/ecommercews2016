@@ -1,4 +1,4 @@
-package Infrastructure;
+package infrastructure;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -282,7 +282,7 @@ public class EdgeController implements RemoteController {
 				try{	
 					edge.simulateEdgeFailure();
 				}catch(EdgeFailureException e){
-					//TODO: Exceptionhandling (maybe generate Error-Erray and return it after completion)					
+					//TODO: Exceptionhandling (maybe generate Error-Array and return it after completion)					
 				}
 			}
 		}

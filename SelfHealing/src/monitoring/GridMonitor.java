@@ -2,9 +2,9 @@ package monitoring;
 
 import javax.swing.*; // JFrame, JPanel, ...
 
-import Infrastructure.Edge;
-import Infrastructure.Request;
-import Infrastructure.VM;
+import infrastructure.Edge;
+import infrastructure.Request;
+import infrastructure.VM;
 import interfaces.LocationElement;
 
 import java.awt.*; // GridLayout

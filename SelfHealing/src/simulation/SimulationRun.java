@@ -5,11 +5,11 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import Infrastructure.Edge;
-import Infrastructure.EdgeController;
-import Infrastructure.PM;
-import Infrastructure.Request;
-import Infrastructure.VM;
+import infrastructure.Edge;
+import infrastructure.EdgeController;
+import infrastructure.PM;
+import infrastructure.Request;
+import infrastructure.VM;
 import interfaces.Remote;
 
 import sla.SLA;

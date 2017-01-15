@@ -1,6 +1,6 @@
 package comparables;
 
-import Infrastructure.PM;
+import infrastructure.PM;
 
 public class ComparablePM implements Comparable<ComparablePM> {
 	private final PM pm;

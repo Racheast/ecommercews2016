@@ -9,8 +9,8 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import Infrastructure.Edge;
-import Infrastructure.VM;
+import infrastructure.Edge;
+import infrastructure.VM;
 
 public class GridMonitor2 extends JFrame{
 	private Edge[][] edges;

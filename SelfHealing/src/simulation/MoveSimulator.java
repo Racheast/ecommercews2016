@@ -4,8 +4,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import Infrastructure.Request;
-import Infrastructure.VM;
+import infrastructure.Request;
+import infrastructure.VM;
 import interfaces.Remote;
 
 public class MoveSimulator {

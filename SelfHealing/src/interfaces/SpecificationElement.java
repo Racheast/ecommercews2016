@@ -1,6 +1,6 @@
 package interfaces;
 
-import Infrastructure.Request;
+import infrastructure.Request;
 
 public interface SpecificationElement {	
 	public int getMemory();

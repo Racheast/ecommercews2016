@@ -1,6 +1,6 @@
 package comparables;
 
-import Infrastructure.Edge;
+import infrastructure.Edge;
 
 public class ComparableEdge implements Comparable<ComparableEdge> {
 	private final Edge edge;

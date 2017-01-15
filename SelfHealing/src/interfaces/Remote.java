@@ -1,6 +1,6 @@
 package interfaces;
 
-import Infrastructure.VM;
+import infrastructure.VM;
 
 public interface Remote {
 	public boolean stop();
