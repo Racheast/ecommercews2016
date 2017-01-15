@@ -72,8 +72,8 @@ public class TimeSeriesMonitor extends ApplicationFrame {
         axis.setAutoRange(true);
         axis.setFixedAutoRange(60000.0);  // 60 seconds
         axis = plot.getRangeAxis();
-        axis.setRange(0.0, 15000); 
-        
+        //axis.setRange(0.0, 15000);  
+        axis.setAutoRange(true);
         //Set the graph colors
         XYLineAndShapeRenderer renderer0 = new XYLineAndShapeRenderer(); 
         XYLineAndShapeRenderer renderer1 = new XYLineAndShapeRenderer(); 

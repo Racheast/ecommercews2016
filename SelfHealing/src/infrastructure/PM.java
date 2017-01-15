@@ -145,9 +145,7 @@ public class PM {
 			u_total += u_cpu * (vm.getCpu() / cpu) + u_mem * (vm.getMemory() / memory)
 					+ u_network * (vm.getNetworkBandwidth() / network_bandwidth);
 		}
-		System.out.println("PM.getEnergyUtil(), ID="+this.ID+", VM keys="+keys);
-		System.out.println("PM.getEnergyUtil(), ID="+this.ID+", u0="+u0);
-		System.out.println("PM.getEnertyUtil(), ID="+this.ID+", u_total="+u_total);
+		
 		return u_total;
 	}
 

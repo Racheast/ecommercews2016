@@ -104,10 +104,11 @@ public class SimulationRun{
 		HashMap<Integer, PM> pms = new HashMap<Integer, PM>();
 		
 		for(int i=0; i<7; i++){
-			//TODO: ADJUST THESE VALUES REALISTICALLY
-			double cpu = 100000000;
-			double memory = 500000000;
-			int size = 100;
+			//Adjusted to max requirements of SLA
+
+			double cpu = 4; // {2,3,4} in SLAs
+			double memory = 8; // {3,4,8} in SLAs
+			int size = 2; // {1,2,2} in SLAs
 			
 			//TODO: ADJUST THESE VALUES REALISTICALLY
 			double u0 = 100;
@@ -148,11 +149,12 @@ public class SimulationRun{
 
 	private VM generateVM() {
 		Random rand = new Random();
-		int needed_memory = Math.abs((int) Math.round(rand.nextGaussian() * 15 + 1000));
-		int needed_cpu = Math.abs((int) Math.round(rand.nextGaussian() * 15 + 1500));
-		int needed_bandwidth = Math.abs((int) Math.round(rand.nextGaussian() * 15 + 1500));
-		int needed_size = rand.nextInt(3) + 1;
-		int runtime = Math.abs((int) Math.round(rand.nextGaussian() * 7000 + 10000)); // runtime
+		int needed_memory = rand.nextInt(8) + 1; //{3,4,8} in SLAs, here we generate from 1 to 8
+		// int needed_memory = (int) Math.round(rand.nextDouble()*5 + 3); this is uniformly distributed
+		int needed_cpu = rand.nextInt(4)+1; //{2,3,4} in SLAs - here we generate from 1 to 4
+		int needed_bandwidth = rand.nextInt(100)+24; // {24,57,108} in SLAs, here we generate from 24 to 124
+		int needed_size = rand.nextInt(2) + 1; // {1,2,2} in SLAs, here we generate 1 or 2
+		int runtime = Math.abs((int) Math.round(rand.nextGaussian() * 1000 + 1500)); // runtime was not adjusted
 
 		return new VM(generateRequest(), needed_size, needed_cpu, needed_memory, needed_bandwidth, runtime);
 	}
