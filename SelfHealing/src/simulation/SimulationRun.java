@@ -50,6 +50,19 @@ public class SimulationRun{
 	
 	private HashMap<Integer, SLA> generateSLAs(){
 		HashMap<Integer,SLA> slas=new HashMap<Integer,SLA>();
+		
+		/*
+		 * 
+		this.agreedSize = agreedSize;
+		this.agreedMemory = agreedMemory;
+		this.agreedCPU = agreedCPU;
+		this.agreedNetworkBandwidth = agreedNetworkBandwidth;
+		this.agreedNetworkBandwidthBEdges = agreedNetworkBandwidthBEdges;
+		this.agreedLatency = agreedLatency;
+		this.agreedInfrasrtuctureAvailability = agreedInfrasrtuctureAvailability;
+		 * 
+		 */
+		
 		SLA sla1 = new SLA(1, 3, 4, 54, 600, 70, 0.9995);
 		SLA sla2 = new SLA(2, 4, 8, 108, 600, 90, 0.9895);
 		SLA sla3 = new SLA(2, 2, 3, 27, 600, 140, 0.85);
@@ -149,14 +162,16 @@ public class SimulationRun{
 
 	private VM generateVM() {
 		Random rand = new Random();
-		int needed_memory = rand.nextInt(8) + 1; //{3,4,8} in SLAs, here we generate from 1 to 8
-		// int needed_memory = (int) Math.round(rand.nextDouble()*5 + 3); this is uniformly distributed
-		int needed_cpu = rand.nextInt(4)+1; //{2,3,4} in SLAs - here we generate from 1 to 4
-		int needed_bandwidth = rand.nextInt(100)+24; // {24,57,108} in SLAs, here we generate from 24 to 124
-		int needed_size = rand.nextInt(2) + 1; // {1,2,2} in SLAs, here we generate 1 or 2
-		int runtime = Math.abs((int) Math.round(rand.nextGaussian() * 1000 + 1500)); // runtime was not adjusted
-
-		return new VM(generateRequest(), needed_size, needed_cpu, needed_memory, needed_bandwidth, runtime);
+		
+		Request request = generateRequest();
+		
+		int needed_memory = rand.nextInt(request.getSla().getAgreedMemory()) + 1; //{3,4,8} in SLAs
+		int needed_cpu = rand.nextInt(request.getSla().getAgreedCPU())+1; //{2,3,4} in SLAs 
+		int needed_bandwidth = rand.nextInt(request.getSla().getAgreedCPU())+24; // {24,57,108} in SLAs
+		int needed_size = rand.nextInt(request.getSla().getAgreedSize()) + 1; // {1,2,2} in SLAs
+		int runtime = Math.abs((int) Math.round(rand.nextGaussian() * 1000 + 1500)); 
+		
+		return new VM(request, needed_size, needed_cpu, needed_memory, needed_bandwidth, runtime);
 	}
 
 	private Request generateRequest() {

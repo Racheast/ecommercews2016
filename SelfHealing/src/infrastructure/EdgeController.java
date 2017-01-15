@@ -14,6 +14,7 @@ import interfaces.LocationElement;
 import interfaces.Remote;
 import interfaces.RemoteController;
 import sla.SLAError;
+import sla.SLAField;
 
 public class EdgeController implements RemoteController {
 	private HashMap<Integer, Edge> edges;
@@ -51,25 +52,24 @@ public class EdgeController implements RemoteController {
 		}
 	}
 
-	// FIFO realization for handling requests
 	public synchronized RemoteClient sendVM(VM vm) {
 		ArrayList<SLAError> slaErrors = new ArrayList<SLAError>();
 		// check if vm-specs don't violate the SLAs which are assigned to the
 		// request
 		if (vm.getCpu() > vm.getRequest().getSla().getAgreedCPU()) {
-			//slaErrors.add(new SLAError(SLAField.agreedCPU, "Requested more than specified in the SLA."));
+			slaErrors.add(new SLAError(SLAField.agreedCPU, "Requested more than specified in the SLA. [requested=" + vm.getCpu()+", sla="+vm.getRequest().getSla().getAgreedCPU()+"]"));
 		}
 
 		if (vm.getMemory() > vm.getRequest().getSla().getAgreedMemory()) {
-			//slaErrors.add(new SLAError(SLAField.agreedMemory, "Requested more than specified in the SLA."));
+			slaErrors.add(new SLAError(SLAField.agreedMemory, "Requested more than specified in the SLA. [requested=" + vm.getMemory()+", sla="+vm.getRequest().getSla().getAgreedMemory()+"]"));
 		}
 
 		if (vm.getSize() > vm.getRequest().getSla().getAgreedSize()) {
-			//slaErrors.add(new SLAError(SLAField.agreedSize, "Requested more than specified in the SLA."));
+			slaErrors.add(new SLAError(SLAField.agreedSize, "Requested more than specified in the SLA. [requested=" + vm.getSize()+", sla="+vm.getRequest().getSla().getAgreedSize()+"]" ));
 		}
 
 		if (vm.getNetworkBandwidth() > vm.getRequest().getSla().getAgreedNetworkBandwidth()) {
-			//slaErrors.add(new SLAError(SLAField.agreedCPU, "Requested more than specified in the SLA."));
+			slaErrors.add(new SLAError(SLAField.agreedNetworkBandwidth, "Requested more than specified in the SLA.[requested=" + vm.getNetworkBandwidth()+", sla="+vm.getRequest().getSla().getAgreedNetworkBandwidth()+"]"));
 		}
 
 		if (slaErrors.size() == 0) {
@@ -96,7 +96,7 @@ public class EdgeController implements RemoteController {
 			for (SLAError e : slaErrors) {
 				System.out.println(e);
 			}
-			System.out.println(vm.compactString()+" could not be forwarded\n");
+			System.out.println("CONTROLLER: " + vm.compactString() + " could not be forwarded\n");
 		}
 		return null;
 	}
