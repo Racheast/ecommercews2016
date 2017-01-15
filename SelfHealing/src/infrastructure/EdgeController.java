@@ -247,6 +247,7 @@ public class EdgeController implements RemoteController {
 		for(int key:keys){
 			u_total+=edges.get(key).getEnergyUtilization();
 		}
+		System.out.println("CONTROLLER: u_total="+u_total);
 		return u_total;
 	}
 	
