@@ -130,7 +130,7 @@ public class PM {
 		return true;
 	}
 
-	private ArrayList<VM> getListOfVMs() {
+	public ArrayList<VM> getListOfVMs() {
 		ArrayList<VM> vmList = new ArrayList<VM>();
 		Set<Integer> keys = vms.keySet();
 		for (int key : keys)

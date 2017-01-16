@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import constant.CommonType;
 import infrastructure.Edge;
 import infrastructure.EdgeController;
 import infrastructure.PM;
@@ -22,32 +25,53 @@ public class SimulationRun{
 	private HashMap<Integer, VM> vms;
 	private final Timer timer;
 	private final EdgeController controller;
-	private FailureSimulator failureSimulator;
+	//private FailureSimulator failureSimulator;
+	private FailureSimulator2 failureSimulator2_pm;
+	private FailureSimulator2 failureSimulator2_edge;
+	
+	private Executor executor;
 	
 	/*
 	 * Randomized constructor
 	 */
 	public SimulationRun(int x_max, int y_max, boolean improved) {
+		this.executor = Executors.newCachedThreadPool();
+
 		this.timer=new Timer();
 		vms = new HashMap<Integer, VM>();
 		slas = generateSLAs();
 		this.x_max = x_max;
 		this.y_max = y_max;
 		this.controller = new EdgeController(generateRandomEdgeMap(), improved);
-		//this.failureSimulator=new FailureSimulator(controller);
-		this.failureSimulator = new FailureSimulator(x_max, y_max, slas, vms, timer, controller, null, null);
+		
+		if(improved == false){
+			this.failureSimulator2_pm = new FailureSimulator2(this.controller, CommonType.PM, CommonType.RETRY);
+			this.failureSimulator2_edge = new FailureSimulator2(this.controller, CommonType.EDGE, CommonType.RETRY);
+		} else {
+			this.failureSimulator2_pm = new FailureSimulator2(this.controller, CommonType.PM, CommonType.JOB_MIGRATION);
+			this.failureSimulator2_edge = new FailureSimulator2(this.controller, CommonType.EDGE, CommonType.JOB_MIGRATION);
+		}
 	}
 	
 	/*
 	 * Non-randomized constructor
 	 */
 	public SimulationRun(boolean improved){
+		this.executor = Executors.newCachedThreadPool();
 		this.timer=new Timer();
 		this.x_max=10;
 		this.y_max=10;
 		vms = new HashMap<Integer, VM>();
 		slas = generateSLAs();
 		this.controller = new EdgeController(generateFixedEdgeMap(), improved);
+		
+		if(improved == false){
+			this.failureSimulator2_pm = new FailureSimulator2(this.controller, CommonType.RETRY, CommonType.PM);
+			this.failureSimulator2_edge = new FailureSimulator2(this.controller, CommonType.RETRY, CommonType.EDGE);
+		} else {
+			this.failureSimulator2_pm = new FailureSimulator2(this.controller, CommonType.JOB_MIGRATION, CommonType.PM);
+			this.failureSimulator2_edge = new FailureSimulator2(this.controller, CommonType.JOB_MIGRATION, CommonType.EDGE);
+		}
 	}
 	
 	private HashMap<Integer, SLA> generateSLAs(){
@@ -188,6 +212,11 @@ public class SimulationRun{
 	public void start() {
 		System.out.println(controller.printMap() + "\n");
 		
+		//Simulate edge failures and pm failures in the defined controller.
+		executor.execute(failureSimulator2_edge);
+		executor.execute(failureSimulator2_pm);
+		
+		//Simulate the generation of new requests each x seconds
 		timer.schedule(new TimerTask() {
 
 			@Override
@@ -204,7 +233,7 @@ public class SimulationRun{
 					moveSimulator.start();
 				}
 			}
-		}, 0, 1500); // generating new requests
+		}, 0, 5000); // generating new requests
 	}
 	
 	public void stop(){

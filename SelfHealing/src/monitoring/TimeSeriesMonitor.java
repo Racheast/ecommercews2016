@@ -55,7 +55,7 @@ public class TimeSeriesMonitor extends ApplicationFrame {
         //this.chart=createChart(dataset);
         
         this.chart=ChartFactory.createTimeSeriesChart(
-                "Total Energy Utilization", 
+                title, 
                 "Time", 
                 "Value",
                 dataset, 
