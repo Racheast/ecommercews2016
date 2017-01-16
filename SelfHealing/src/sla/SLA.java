@@ -49,9 +49,6 @@ public class SLA {
 	public double getAgreedInfrasrtuctureAvailability() {
 		return agreedInfrasrtuctureAvailability;
 	}
-
-	
-
 	
 }
 
