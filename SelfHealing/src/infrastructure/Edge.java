@@ -144,6 +144,7 @@ public class Edge implements LocationElement {
 			u_total += pms.get(key).getEnergyUtilization();
 		}
 		return u_total;
+		
 	}
 
 	public synchronized ArrayList<PM> getListOfPMs() {

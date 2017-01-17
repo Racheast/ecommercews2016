@@ -195,8 +195,7 @@ public class SimulationRun{
 		int needed_cpu = rand.nextInt(request.getSla().getAgreedCPU())+1; //{2,3,4} in SLAs 
 		int needed_bandwidth = rand.nextInt(request.getSla().getAgreedCPU())+24; // {24,57,108} in SLAs
 		int needed_size = rand.nextInt(request.getSla().getAgreedSize()) + 1; // {1,2,2} in SLAs
-		int runtime = Math.abs((int) Math.round(rand.nextGaussian() * 1000 + 1500)); 
-		
+		int runtime = Math.abs((int) Math.round(rand.nextGaussian() * 1000 + 6000)); 
 		return new VM(request, needed_size, needed_cpu, needed_memory, needed_bandwidth, runtime);
 	}
 
@@ -217,6 +216,7 @@ public class SimulationRun{
 		executor.execute(failureSimulator2_pm);
 		
 		//Simulate the generation of new requests each x seconds
+		
 		timer.schedule(new TimerTask() {
 			MoveSimulator moveSimulator=null;
 			@Override
@@ -242,6 +242,7 @@ public class SimulationRun{
 				return super.cancel();
 			}
 		}, 0, 5000); // generating new requests
+		
 	}
 	
 	public void stop(){

@@ -249,6 +249,7 @@ public class EdgeController implements RemoteController {
 		}
 		System.out.println("CONTROLLER: u_total="+u_total);
 		return u_total;
+		
 	}
 	/*
 	public synchronized void simulatePMFailure(){
