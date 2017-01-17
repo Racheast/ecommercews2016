@@ -29,7 +29,7 @@ public class SimulationRun{
 	private FailureSimulator2 failureSimulator2_pm;
 	private FailureSimulator2 failureSimulator2_edge;
 	
-	private Executor executor;
+	private ExecutorService executor;
 	
 	/*
 	 * Randomized constructor
@@ -218,7 +218,7 @@ public class SimulationRun{
 		
 		//Simulate the generation of new requests each x seconds
 		timer.schedule(new TimerTask() {
-
+			MoveSimulator moveSimulator=null;
 			@Override
 			public void run() {
 				
@@ -229,19 +229,35 @@ public class SimulationRun{
 
 				Remote remote = controller.sendVM(vm);
 				if(remote!=null){
-					MoveSimulator moveSimulator=new MoveSimulator(remote, x_max,y_max);
+					moveSimulator=new MoveSimulator(remote, x_max,y_max);
 					moveSimulator.start();
 				}
+			}
+			
+			@Override
+			public boolean cancel(){
+				if(moveSimulator != null){
+					moveSimulator.stop();
+				}
+				return super.cancel();
 			}
 		}, 0, 5000); // generating new requests
 	}
 	
 	public void stop(){
 		this.timer.cancel();
+		this.timer.purge();
+		this.executor.shutdownNow();
 	}
-
+	
 	public EdgeController getController() {
 		return controller;
+	}
+	
+	public String printStatistics(){
+		String output=this.failureSimulator2_edge.printStatistics() + this.failureSimulator2_pm.printStatistics();
+		System.out.println(output);
+		return output;
 	}
 
 }

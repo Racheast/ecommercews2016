@@ -51,7 +51,8 @@ public class FailureSimulator2 implements Runnable {
 		Thread thisThread = Thread.currentThread();
 		Random rand = new Random();
 		t = thisThread;
-		while (t == thisThread) {
+		//while (t == thisThread) {
+		while(t == thisThread){	
 			System.out.println("");
 			System.out.println("FailureSimulator: START " + getHandType());
 			try {
@@ -84,11 +85,12 @@ public class FailureSimulator2 implements Runnable {
 				thisThread.sleep(sleep);
 
 			} catch (InterruptedException e) {
+				t = null;
 			}
 		}
 	}
 
-
+	
 	public synchronized void simulatePMFailure(ArrayList<Integer> pm_ids, CommonType simuType, CommonType handType) {
 		Random r = new Random();
 		int numberFails = (int) Math.abs(Math.round(r.nextGaussian() * 2 + pm_ids.size() * 0.1));
@@ -326,5 +328,40 @@ public class FailureSimulator2 implements Runnable {
 
 	public int getTotalEdgeImproveJobFixes() {
 		return totalEdgeImproveJobFixes;
+	}
+	
+	public String printStatistics(){
+		String output="";
+		
+		if(handType == CommonType.RETRY){
+			output += "+++Final statistics for the baseline [retry]+++";
+			output +="\n";
+			if(simuType == CommonType.PM){
+				output += "Total PM Failures [Baseline]: " + totalPMBaseJobFailures;
+				output += "\n";
+				output += "Total PM Fixes [Baseline]: " + totalPMBaseJobFixes;
+				output += "\n";
+			} else if(simuType == CommonType.EDGE){
+				output += "Total Edge Failures [Baseline]: " + totalEdgeBaseJobFailures;
+				output += "\n";
+				output += "Total Edge Fixes [Baseline]: " + totalEdgeBaseJobFixes;
+				output += "\n";
+			}
+		} else if(handType == CommonType.JOB_MIGRATION){
+			output += "+++Final statistics for the improved version [retry + job migration]+++";
+			output +="\n";
+			if(simuType == CommonType.PM){
+				output += "Total PM Failures [Improved]: " + totalPMImproveJobFailures;
+				output += "\n";
+				output += "Total PM Fixes [Improved]: " + totalPMImproveJobFixes;
+				output += "\n";
+			} else if(simuType == CommonType.EDGE){
+				output += "Total Edge Failures [Improved]: " + totalEdgeImproveJobFailures;
+				output += "\n";
+				output += "Total Edge Fixes [Improved]: " + totalEdgeImproveJobFixes;
+				output += "\n";
+			}
+		}
+		return output;
 	}
 }
