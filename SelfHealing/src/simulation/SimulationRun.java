@@ -9,6 +9,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import constant.CommonType;
+import constant.HandType;
+import constant.SimuType;
 import infrastructure.Edge;
 import infrastructure.EdgeController;
 import infrastructure.PM;
@@ -19,6 +21,8 @@ import interfaces.Remote;
 import sla.SLA;
 
 public class SimulationRun{
+	private final int requestGenInterval = 1500; //in ms
+	
 	private final int x_max;
 	private final int y_max;
 	private HashMap<Integer, SLA> slas;
@@ -45,11 +49,11 @@ public class SimulationRun{
 		this.controller = new EdgeController(generateRandomEdgeMap(), improved);
 		
 		if(improved == false){
-			this.failureSimulator2_pm = new FailureSimulator2(this.controller, CommonType.PM, CommonType.RETRY);
-			this.failureSimulator2_edge = new FailureSimulator2(this.controller, CommonType.EDGE, CommonType.RETRY);
+			this.failureSimulator2_pm = new FailureSimulator2(this.controller, SimuType.PM, HandType.RETRY);
+			this.failureSimulator2_edge = new FailureSimulator2(this.controller, SimuType.EDGE, HandType.RETRY);
 		} else {
-			this.failureSimulator2_pm = new FailureSimulator2(this.controller, CommonType.PM, CommonType.JOB_MIGRATION);
-			this.failureSimulator2_edge = new FailureSimulator2(this.controller, CommonType.EDGE, CommonType.JOB_MIGRATION);
+			this.failureSimulator2_pm = new FailureSimulator2(this.controller, SimuType.PM, HandType.JOB_MIGRATION);
+			this.failureSimulator2_edge = new FailureSimulator2(this.controller, SimuType.EDGE, HandType.JOB_MIGRATION);
 		}
 	}
 	
@@ -66,11 +70,11 @@ public class SimulationRun{
 		this.controller = new EdgeController(generateFixedEdgeMap(), improved);
 		
 		if(improved == false){
-			this.failureSimulator2_pm = new FailureSimulator2(this.controller, CommonType.RETRY, CommonType.PM);
-			this.failureSimulator2_edge = new FailureSimulator2(this.controller, CommonType.RETRY, CommonType.EDGE);
+			this.failureSimulator2_pm = new FailureSimulator2(this.controller, SimuType.PM, HandType.RETRY);
+			this.failureSimulator2_edge = new FailureSimulator2(this.controller, SimuType.EDGE, HandType.RETRY);
 		} else {
-			this.failureSimulator2_pm = new FailureSimulator2(this.controller, CommonType.JOB_MIGRATION, CommonType.PM);
-			this.failureSimulator2_edge = new FailureSimulator2(this.controller, CommonType.JOB_MIGRATION, CommonType.EDGE);
+			this.failureSimulator2_pm = new FailureSimulator2(this.controller, SimuType.PM, HandType.JOB_MIGRATION);
+			this.failureSimulator2_edge = new FailureSimulator2(this.controller, SimuType.EDGE, HandType.JOB_MIGRATION);
 		}
 	}
 	
@@ -241,7 +245,7 @@ public class SimulationRun{
 				}
 				return super.cancel();
 			}
-		}, 0, 5000); // generating new requests
+		}, 0, requestGenInterval); // generating new requests
 		
 	}
 	
@@ -256,7 +260,14 @@ public class SimulationRun{
 	}
 	
 	public String printStatistics(){
-		String output=this.failureSimulator2_edge.printStatistics() + this.failureSimulator2_pm.printStatistics();
+		String output = "---Final Failure Handling Result";
+		if(this.failureSimulator2_edge.getHandType()==HandType.RETRY){
+			output += " [Retry]---\n";
+		} else if(this.failureSimulator2_edge.getHandType()==HandType.JOB_MIGRATION){
+			output += " [Retry + Job Migration]---\n";
+		}
+			
+		output+=this.failureSimulator2_edge.printStatistics() + this.failureSimulator2_pm.printStatistics();
 		System.out.println(output);
 		return output;
 	}

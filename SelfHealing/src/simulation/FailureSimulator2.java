@@ -8,6 +8,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import constant.CommonType;
+import constant.HandType;
+import constant.SimuType;
 import exceptions.EdgeFailureException;
 import exceptions.PMFailureException;
 import infrastructure.Edge;
@@ -21,14 +23,14 @@ public class FailureSimulator2 implements Runnable {
 	private EdgeController controller;
 	private volatile Thread t;
 
-	private CommonType handType;
-	private CommonType simuType;
+	private HandType handType;
+	private SimuType simuType;
 
-	public FailureSimulator2(EdgeController controller, CommonType handType, CommonType simuType) {
-		super();
+	public FailureSimulator2(EdgeController controller, SimuType simuType, HandType handType) {
+		//super();
 		this.controller = controller;
-		this.handType = handType;
 		this.simuType = simuType;
+		this.handType = handType;
 	}
 
 	private int totalPMBaseJobFailures = 0;
@@ -61,7 +63,7 @@ public class FailureSimulator2 implements Runnable {
 
 				ArrayList<Integer> pm_ids = getAllPMIDs();
 
-				if (getSimuType() == CommonType.PM) {
+				if (getSimuType() == SimuType.PM) {
 					simulatePMFailure(pm_ids, getSimuType(), getHandType());
 					System.out.println("-------------------- REPORT --------------------");
 					System.out.println("Total PM base job failures = " + getTotalPMBaseJobFailures());
@@ -69,7 +71,7 @@ public class FailureSimulator2 implements Runnable {
 					System.out.println("Total PM improved job failures = " + getTotalPMImproveJobFailures());
 					System.out.println("Total PM improved job Fixes = " + getTotalPMImproveJobFixes());
 					System.out.println("-------------------------------------------------");
-				} else if (getSimuType() == CommonType.EDGE) {
+				} else if (getSimuType() == SimuType.EDGE) {
 					simulateEdgeFailure(getSimuType(), getHandType());
 					System.out.println("-------------------- REPORT --------------------");
 					System.out.println("Total EDGE base job failures = " + getTotalEdgeBaseJobFailures());
@@ -91,7 +93,7 @@ public class FailureSimulator2 implements Runnable {
 	}
 
 	
-	public synchronized void simulatePMFailure(ArrayList<Integer> pm_ids, CommonType simuType, CommonType handType) {
+	public synchronized void simulatePMFailure(ArrayList<Integer> pm_ids, SimuType simuType, HandType handType) {
 		Random r = new Random();
 		int numberFails = (int) Math.abs(Math.round(r.nextGaussian() * 2 + pm_ids.size() * 0.1));
 		for (int i = 0; i < numberFails; i++) {
@@ -106,14 +108,14 @@ public class FailureSimulator2 implements Runnable {
 				} catch (PMFailureException e) {
 					Thread failureThread = Thread.currentThread();
 					if (failureThread.equals(t)) {
-						if (handType == CommonType.RETRY) {
+						if (handType == HandType.RETRY) {
 							int failedCount = 0;
 							boolean isFailed = true;
 							failedCount = recurRetry(isFailed, pm.getID(), failedCount, simuType);
 							System.out.println("Total job failed: " + failedCount);
 							totalPMBaseJobFailures = totalPMBaseJobFailures + failedCount;
 							totalPMBaseJobFixes++;
-						} else if (handType == CommonType.JOB_MIGRATION) {
+						} else if (handType == HandType.JOB_MIGRATION) {
 							boolean isFailed = jobMigrationRequest(pm.getID(), simuType);
 							if (!isFailed) {
 								totalPMImproveJobFixes++;
@@ -140,7 +142,7 @@ public class FailureSimulator2 implements Runnable {
 		}
 	}
 
-	public synchronized void simulateEdgeFailure(CommonType simuType, CommonType handType) {
+	public synchronized void simulateEdgeFailure(SimuType simuType, HandType handType) {
 		HashMap<Integer, Edge> edges = controller.getEdges();
 		ArrayList<Integer> edge_ids = new ArrayList<Integer>(edges.keySet());
 		Random r = new Random();
@@ -157,14 +159,14 @@ public class FailureSimulator2 implements Runnable {
 				} catch (EdgeFailureException e) {
 					Thread failureThread = Thread.currentThread();
 					if (failureThread.equals(t)) {
-						if (handType == CommonType.RETRY) {
+						if (handType == HandType.RETRY) {
 							int failedCount = 0;
 							boolean isFailed = true;
 							failedCount = recurRetry(isFailed, edge.getID(), failedCount, simuType);
 							System.out.println("Total job failed: " + failedCount);
 							totalEdgeBaseJobFailures = totalEdgeBaseJobFailures + failedCount;
 							totalEdgeBaseJobFixes++;
-						} else if (handType == CommonType.JOB_MIGRATION) {
+						} else if (handType == HandType.JOB_MIGRATION) {
 							boolean isFailed = jobMigrationRequest(edge.getID(), simuType);
 							if (!isFailed) {
 								totalEdgeImproveJobFixes++;
@@ -221,7 +223,7 @@ public class FailureSimulator2 implements Runnable {
 
 	}
 
-	private boolean retryRequest(int id, CommonType simuType) {
+	private boolean retryRequest(int id, SimuType simuType) {
 		boolean isFailed = false;
 		int count = 0;
 		for (int j = 0; j < 5; j++) {
@@ -237,9 +239,9 @@ public class FailureSimulator2 implements Runnable {
 				}
 			}
 			if (!isFailed) {
-				if (simuType == CommonType.PM) {
+				if (simuType == SimuType.PM) {
 					totalPMBaseJobFixes++;
-				} else if (simuType == CommonType.EDGE) {
+				} else if (simuType == SimuType.EDGE) {
 					totalEdgeBaseJobFixes++;
 				}
 				System.out.println("Failure fixed for " + simuType + " " + id);
@@ -249,7 +251,7 @@ public class FailureSimulator2 implements Runnable {
 		return isFailed; 
 	}
 
-	private boolean jobMigrationRequest(int id, CommonType simuType) {
+	private boolean jobMigrationRequest(int id, SimuType simuType) {
 		boolean isFailed = false;
 		int count = 0;
 		for (int j = 0; j < 2; j++) {
@@ -272,7 +274,7 @@ public class FailureSimulator2 implements Runnable {
 		return isFailed;
 	}
 
-	public int recurRetry(boolean isFailed, int id, int count, CommonType simuType) {
+	public int recurRetry(boolean isFailed, int id, int count, SimuType simuType) {
 		if (!isFailed)
 			return count;
 		isFailed = retryRequest(id, simuType);
@@ -281,7 +283,7 @@ public class FailureSimulator2 implements Runnable {
 		return recurRetry(isFailed, id, count, simuType);
 	}
 
-	public boolean recurMigration(boolean isFailed, int id, int count, CommonType simuType) {
+	public boolean recurMigration(boolean isFailed, int id, int count, SimuType simuType) {
 		if (count > 1 || !isFailed)
 			return isFailed;
 		isFailed = jobMigrationRequest(id, simuType);
@@ -290,11 +292,11 @@ public class FailureSimulator2 implements Runnable {
 		return recurMigration(isFailed, id, count, simuType);
 	}
 
-	public CommonType getHandType() {
+	public HandType getHandType() {
 		return handType;
 	}
 
-	public CommonType getSimuType() {
+	public SimuType getSimuType() {
 		return simuType;
 	}
 
@@ -333,29 +335,29 @@ public class FailureSimulator2 implements Runnable {
 	public String printStatistics(){
 		String output="";
 		
-		if(handType == CommonType.RETRY){
-			output += "+++Final statistics for the baseline [retry]+++";
-			output +="\n";
-			if(simuType == CommonType.PM){
+		if(handType == HandType.RETRY){
+			//output += "+++Final statistics for the baseline [retry]+++";
+			//output +="\n";
+			if(simuType == SimuType.PM){
 				output += "Total PM Failures [Baseline]: " + totalPMBaseJobFailures;
 				output += "\n";
 				output += "Total PM Fixes [Baseline]: " + totalPMBaseJobFixes;
 				output += "\n";
-			} else if(simuType == CommonType.EDGE){
+			} else if(simuType == SimuType.EDGE){
 				output += "Total Edge Failures [Baseline]: " + totalEdgeBaseJobFailures;
 				output += "\n";
 				output += "Total Edge Fixes [Baseline]: " + totalEdgeBaseJobFixes;
 				output += "\n";
 			}
-		} else if(handType == CommonType.JOB_MIGRATION){
-			output += "+++Final statistics for the improved version [retry + job migration]+++";
-			output +="\n";
-			if(simuType == CommonType.PM){
+		} else if(handType == HandType.JOB_MIGRATION){
+			//output += "+++Final statistics for the improved version [retry + job migration]+++";
+			//output +="\n";
+			if(simuType == SimuType.PM){
 				output += "Total PM Failures [Improved]: " + totalPMImproveJobFailures;
 				output += "\n";
 				output += "Total PM Fixes [Improved]: " + totalPMImproveJobFixes;
 				output += "\n";
-			} else if(simuType == CommonType.EDGE){
+			} else if(simuType == SimuType.EDGE){
 				output += "Total Edge Failures [Improved]: " + totalEdgeImproveJobFailures;
 				output += "\n";
 				output += "Total Edge Fixes [Improved]: " + totalEdgeImproveJobFixes;
