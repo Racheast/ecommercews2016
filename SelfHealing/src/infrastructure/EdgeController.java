@@ -251,45 +251,6 @@ public class EdgeController implements RemoteController {
 		return u_total;
 		
 	}
-	/*
-	public synchronized void simulatePMFailure(){
-		Random r=new Random();
-		ArrayList<Integer> pm_ids=getAllPMIDs();
-		int numberFails=(int)Math.abs(Math.round(r.nextGaussian()*2 + pm_ids.size()*0.1));
-		
-		for(int i=0; i<numberFails; i++){
-			int i2=r.nextInt(pm_ids.size());
-			PM pm=getPMbyID(pm_ids.get(i2));
-			pm_ids.remove(i2);
-			if(pm!=null){
-				try{
-					pm.simulatePMFailure();
-				}catch(PMFailureException e){
-					//TODO: Exceptionhandling (maybe generate Error-Erray and return it after completion)
-				}
-			}
-		}
-	}
-	
-	public synchronized void simulateEdgeFailure(){
-		ArrayList<Integer> edge_ids=new ArrayList<Integer>(edges.keySet());
-		Random r=new Random();
-		int numberFails=(int)Math.abs(Math.round(r.nextGaussian()*2 + edge_ids.size()*0.17));
-		
-		for(int i=0; i<numberFails; i++){
-			int i2=r.nextInt(edge_ids.size());
-			Edge edge=edges.get(edge_ids.get(i2));
-			edge_ids.remove(i2);
-			if(edge!=null){
-				try{	
-					edge.simulateEdgeFailure();
-				}catch(EdgeFailureException e){
-					//TODO: Exceptionhandling (maybe generate Error-Array and return it after completion)					
-				}
-			}
-		}
-	}
-	*/
 	
 	private double calculateLatencyForVM(VM vm){
 		Edge e = this.edges.get(vm.getAddress().getEdge_ID());

@@ -43,21 +43,21 @@ public class TimeSeriesMonitor extends ApplicationFrame {
      *
      * @param title  the frame title.
      */
-    public TimeSeriesMonitor(String title) {
+    public TimeSeriesMonitor(String title, String xAxisLabel, String yAxisLabel) {
         super(title);
         this.currentSecond=new Second();
         this.series = new TimeSeries("Improved", Second.class);
         this.series2 = new TimeSeries("Baseline", Second.class);
         final TimeSeriesCollection dataset = new TimeSeriesCollection(this.series);
         final TimeSeriesCollection dataset2 = new TimeSeriesCollection(this.series2);
-
+        
         //final JFreeChart chart = createChart(dataset);
         //this.chart=createChart(dataset);
         
         this.chart=ChartFactory.createTimeSeriesChart(
                 title, 
-                "Time", 
-                "Value",
+                xAxisLabel, 
+                yAxisLabel,
                 dataset, 
                 true, 
                 true, 
@@ -106,6 +106,10 @@ public class TimeSeriesMonitor extends ApplicationFrame {
 		this.pack();
 		RefineryUtilities.positionFrameRandomly(this);
 		this.setVisible(true);
+	}
+	
+	public JFreeChart getChart(){
+		return this.chart;
 	}
 
 }

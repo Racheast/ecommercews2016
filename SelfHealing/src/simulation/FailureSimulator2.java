@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import constant.CommonType;
 import constant.HandType;
 import constant.SimuType;
 import exceptions.EdgeFailureException;
@@ -15,8 +11,7 @@ import exceptions.PMFailureException;
 import infrastructure.Edge;
 import infrastructure.EdgeController;
 import infrastructure.PM;
-import infrastructure.VM;
-import interfaces.Remote;
+
 
 public class FailureSimulator2 implements Runnable {
 
