@@ -15,7 +15,7 @@ import monitoring.LatencyMonitor;
 public class Simulator {
 
 	public static void main(String[] args) {
-		final int simulationDuration = 12000; // Set the simulationDuration in ms (eg. 1000ms == 1sec).
+		final int simulationDuration = 60000; // Set the simulationDuration in ms (eg. 1000ms == 1sec).
 
 		SimulationRun improvedRun = new SimulationRun(true);
 		SimulationRun baselineRun = new SimulationRun(false);
