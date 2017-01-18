@@ -249,8 +249,9 @@ public class EdgeController implements RemoteController {
 		}
 		System.out.println("CONTROLLER: u_total="+u_total);
 		return u_total;
+		
 	}
-	
+	/*
 	public synchronized void simulatePMFailure(){
 		Random r=new Random();
 		ArrayList<Integer> pm_ids=getAllPMIDs();
@@ -288,6 +289,44 @@ public class EdgeController implements RemoteController {
 			}
 		}
 	}
+	*/
+	
+	private double calculateLatencyForVM(VM vm){
+		Edge e = this.edges.get(vm.getAddress().getEdge_ID());
+		Request r = vm.getRequest();
+		int distance = manhattanDistance(e, r);
+		long latency = distance * 30;
+		return latency;
+	}
+	
+	public double getAverageLatency(){
+		double avgLatency=0;
+		int nrOfVM = getAllVM().size();
+		double latencySum=0;
+		for(VM vm: getAllVM()){
+			latencySum += calculateLatencyForVM(vm);
+		}
+		avgLatency=latencySum/nrOfVM;
+		return avgLatency;
+	}
+	
+	private ArrayList<VM> getAllVM(){
+		ArrayList<VM> vmList = new ArrayList<VM>();
+		for(PM pm: getAllPM()){
+			vmList.addAll(pm.getListOfVMs());
+		}
+		return vmList;
+	}
+	
+	private ArrayList<PM> getAllPM(){
+		ArrayList<PM> pmList = new ArrayList<PM>();
+		
+		for(Edge e: getListOfEdges()){
+			pmList.addAll(e.getListOfPMs());
+		}
+		
+		return pmList;
+	}
 	
 	private ArrayList<Integer> getAllPMIDs(){
 		ArrayList<Integer> pm_ids=new ArrayList<Integer>();
@@ -308,5 +347,8 @@ public class EdgeController implements RemoteController {
 		}
 		return null;
 	}
-
+	
+	public HashMap<Integer, Edge> getEdges() {
+		return edges;
+	}
 }

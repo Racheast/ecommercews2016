@@ -50,6 +50,7 @@ public class MoveSimulator {
 	
 	public void stop(){
 		this.timer.cancel();
+		this.timer.purge();
 	}
 	
 	private void randomizeRequestCoordinates(Request request){

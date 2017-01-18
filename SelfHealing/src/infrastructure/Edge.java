@@ -144,6 +144,7 @@ public class Edge implements LocationElement {
 			u_total += pms.get(key).getEnergyUtilization();
 		}
 		return u_total;
+		
 	}
 
 	public synchronized ArrayList<PM> getListOfPMs() {
@@ -171,7 +172,7 @@ public class Edge implements LocationElement {
 	}
 
 	public String compactString() {
-		return "Edge" + ID;
+		return "Edge - " + ID;
 	}
 
 	private ArrayList<PM> generateSortedEnergyList(VM vm, ArrayList<PM> pms) {

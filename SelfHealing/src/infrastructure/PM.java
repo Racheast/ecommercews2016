@@ -1,3 +1,4 @@
+
 package infrastructure;
 
 import java.util.ArrayList;
@@ -123,13 +124,13 @@ public class PM {
 		this.network_bandwidth = network_bandwidth;
 	}
 
-	public boolean shutdownVM(double vmID) {
+	public boolean shutdownVM(int vmID) {
 		this.vms.remove(vmID);
 		System.out.println(this.compactString() + ": VM" + vmID + " shut down.\n");
 		return true;
 	}
 
-	private ArrayList<VM> getListOfVMs() {
+	public ArrayList<VM> getListOfVMs() {
 		ArrayList<VM> vmList = new ArrayList<VM>();
 		Set<Integer> keys = vms.keySet();
 		for (int key : keys)
@@ -141,9 +142,10 @@ public class PM {
 		double u_total = u0;
 		Set<Integer> keys = vms.keySet();
 		for (int k : keys) {
+			System.out.println("PM: int vm key="+k);
 			VM vm = vms.get(k);
-			u_total += u_cpu * (vm.getCpu() / cpu) + u_mem * (vm.getMemory() / memory)
-					+ u_network * (vm.getNetworkBandwidth() / network_bandwidth);
+			u_total += (u_cpu * (vm.getCpu() / cpu) + u_mem * (vm.getMemory() / memory)
+					+ u_network * (vm.getNetworkBandwidth() / network_bandwidth));
 		}
 		
 		return u_total;
@@ -168,5 +170,4 @@ public class PM {
 	public void simulatePMFailure() throws PMFailureException{
 		throw new PMFailureException(compactString()+": FAILURE OCCURRED!");
 	}
-
 }

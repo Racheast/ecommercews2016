@@ -1,10 +1,16 @@
+
 package simulation;
 
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import constant.CommonType;
+import constant.HandType;
+import constant.SimuType;
 import infrastructure.Edge;
 import infrastructure.EdgeController;
 import infrastructure.PM;
@@ -15,37 +21,61 @@ import interfaces.Remote;
 import sla.SLA;
 
 public class SimulationRun{
+	private final int requestGenInterval = 1500; //in ms
+	
 	private final int x_max;
 	private final int y_max;
 	private HashMap<Integer, SLA> slas;
 	private HashMap<Integer, VM> vms;
 	private final Timer timer;
 	private final EdgeController controller;
-	private FailureSimulator failureSimulator;
+	//private FailureSimulator failureSimulator;
+	private FailureSimulator2 failureSimulator2_pm;
+	private FailureSimulator2 failureSimulator2_edge;
+	
+	private ExecutorService executor;
 	
 	/*
 	 * Randomized constructor
 	 */
 	public SimulationRun(int x_max, int y_max, boolean improved) {
+		this.executor = Executors.newCachedThreadPool();
+
 		this.timer=new Timer();
 		vms = new HashMap<Integer, VM>();
 		slas = generateSLAs();
 		this.x_max = x_max;
 		this.y_max = y_max;
 		this.controller = new EdgeController(generateRandomEdgeMap(), improved);
-		this.failureSimulator=new FailureSimulator(controller);
+		
+		if(improved == false){
+			this.failureSimulator2_pm = new FailureSimulator2(this.controller, SimuType.PM, HandType.RETRY);
+			this.failureSimulator2_edge = new FailureSimulator2(this.controller, SimuType.EDGE, HandType.RETRY);
+		} else {
+			this.failureSimulator2_pm = new FailureSimulator2(this.controller, SimuType.PM, HandType.JOB_MIGRATION);
+			this.failureSimulator2_edge = new FailureSimulator2(this.controller, SimuType.EDGE, HandType.JOB_MIGRATION);
+		}
 	}
 	
 	/*
 	 * Non-randomized constructor
 	 */
 	public SimulationRun(boolean improved){
+		this.executor = Executors.newCachedThreadPool();
 		this.timer=new Timer();
 		this.x_max=10;
 		this.y_max=10;
 		vms = new HashMap<Integer, VM>();
 		slas = generateSLAs();
 		this.controller = new EdgeController(generateFixedEdgeMap(), improved);
+		
+		if(improved == false){
+			this.failureSimulator2_pm = new FailureSimulator2(this.controller, SimuType.PM, HandType.RETRY);
+			this.failureSimulator2_edge = new FailureSimulator2(this.controller, SimuType.EDGE, HandType.RETRY);
+		} else {
+			this.failureSimulator2_pm = new FailureSimulator2(this.controller, SimuType.PM, HandType.JOB_MIGRATION);
+			this.failureSimulator2_edge = new FailureSimulator2(this.controller, SimuType.EDGE, HandType.JOB_MIGRATION);
+		}
 	}
 	
 	private HashMap<Integer, SLA> generateSLAs(){
@@ -169,8 +199,7 @@ public class SimulationRun{
 		int needed_cpu = rand.nextInt(request.getSla().getAgreedCPU())+1; //{2,3,4} in SLAs 
 		int needed_bandwidth = rand.nextInt(request.getSla().getAgreedCPU())+24; // {24,57,108} in SLAs
 		int needed_size = rand.nextInt(request.getSla().getAgreedSize()) + 1; // {1,2,2} in SLAs
-		int runtime = Math.abs((int) Math.round(rand.nextGaussian() * 1000 + 1500)); 
-		
+		int runtime = Math.abs((int) Math.round(rand.nextGaussian() * 1000 + 6000)); 
 		return new VM(request, needed_size, needed_cpu, needed_memory, needed_bandwidth, runtime);
 	}
 
@@ -186,8 +215,14 @@ public class SimulationRun{
 	public void start() {
 		System.out.println(controller.printMap() + "\n");
 		
+		//Simulate edge failures and pm failures in the defined controller.
+		executor.execute(failureSimulator2_edge);
+		executor.execute(failureSimulator2_pm);
+		
+		//Simulate the generation of new requests each x seconds
+		
 		timer.schedule(new TimerTask() {
-
+			MoveSimulator moveSimulator=null;
 			@Override
 			public void run() {
 				
@@ -198,19 +233,43 @@ public class SimulationRun{
 
 				Remote remote = controller.sendVM(vm);
 				if(remote!=null){
-					MoveSimulator moveSimulator=new MoveSimulator(remote, x_max,y_max);
+					moveSimulator=new MoveSimulator(remote, x_max,y_max);
 					moveSimulator.start();
 				}
 			}
-		}, 0, 1500); // generating new requests
+			
+			@Override
+			public boolean cancel(){
+				if(moveSimulator != null){
+					moveSimulator.stop();
+				}
+				return super.cancel();
+			}
+		}, 0, requestGenInterval); // generating new requests
+		
 	}
 	
 	public void stop(){
 		this.timer.cancel();
+		this.timer.purge();
+		this.executor.shutdownNow();
 	}
-
+	
 	public EdgeController getController() {
 		return controller;
+	}
+	
+	public String printStatistics(){
+		String output = "---Final Failure Handling Result";
+		if(this.failureSimulator2_edge.getHandType()==HandType.RETRY){
+			output += " [Retry]---\n";
+		} else if(this.failureSimulator2_edge.getHandType()==HandType.JOB_MIGRATION){
+			output += " [Retry + Job Migration]---\n";
+		}
+			
+		output+=this.failureSimulator2_edge.printStatistics() + this.failureSimulator2_pm.printStatistics();
+		System.out.println(output);
+		return output;
 	}
 
 }
